@@ -4,8 +4,19 @@
   "description": "Capstone project for Udacity Front End Web Developer nanodegree",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-prod": "webpack --config webpack.prod.js",
+    "build-dev": "webpack-dev-server --config webpack.dev.js --open"
   },
   "author": "Piervalerio Vignola",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "babel-loader": "^8.0.6"
+  }
 }
