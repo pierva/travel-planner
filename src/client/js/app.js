@@ -17,8 +17,8 @@ const model = {
  * DOM elements, backend API and client data.
 */
 const octo = {
-    init: () => {
-        view.init()
+    init: (img) => {
+        view.init(img)
     },
 }
 
@@ -28,10 +28,11 @@ const octo = {
  * 
 */
 const view = {
-    init: () => {
+    init: (imgSrc) => {
         // Wait until the DOM is fully loaded before initializing the view
         document.addEventListener('DOMContentLoaded', () => {
-            alert('All working fine')
+            const img = document.getElementsByClassName('image')[0]
+            img.src = imgSrc
         })
     }
 }
