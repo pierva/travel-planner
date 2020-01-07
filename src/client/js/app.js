@@ -17,8 +17,8 @@ const model = {
  * DOM elements, backend API and client data.
 */
 const octo = {
-    init: (img) => {
-        view.init(img)
+    init: () => {
+        view.init()
     },
 }
 
@@ -28,13 +28,26 @@ const octo = {
  * 
 */
 const view = {
-    init: (imgSrc) => {
+    init: () => {
         // Wait until the DOM is fully loaded before initializing the view
         document.addEventListener('DOMContentLoaded', () => {
-            const img = document.getElementsByClassName('image')[0]
-            img.src = imgSrc
+            view.updateContainerHeight()
+            window.onresize = () => {
+                view.updateContainerHeight()
+            }
         })
-    }
+    },
+
+    updateContainerHeight: () => {
+        const containers = document.querySelectorAll('.card-container')
+        for (let i = 0; i < containers.length; i++) {
+            const parent = containers[i].parentElement
+            const imgHeight = containers[i].previousElementSibling.offsetHeight
+            const containerHeight = containers[i].offsetHeight
+            parent.style.height = containerHeight > imgHeight ?
+                containerHeight : imgHeight
+        }
+    },
 }
 
 // Export the application. In order to initiate the app, call 
