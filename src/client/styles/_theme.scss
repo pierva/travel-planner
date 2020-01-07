@@ -1,6 +1,7 @@
 $primary-color: #393939;
 $secondary-color: #6348bb;
-$primary-font: 'Indie Flower', cursive;
+$primary-font: 'Anonymous Pro', monospace;
+$secondary-font: 'Indie Flower', cursive;
 $base-font-size: 18px;
 $default-padding: 0.5rem;
 
@@ -9,7 +10,7 @@ h1 {
 }
 
 h2 {
-    font-size: 2.7em;
+    font-size: 2.5em;
 }
 
 h3 {
@@ -18,12 +19,15 @@ h3 {
 
 h4 {
     font-size: 2em;
+    font-weight: 600;
 }
 
 h5 {
     font-size: 1.6em;
+    font-weight: 600;
 }
 
 h6 {
     font-size: 1.2em;
+    font-weight: 600;
 }

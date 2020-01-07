@@ -1,6 +1,8 @@
 @import 'theme';
 @import 'utilities';
 
+$max-card-height: 600px;
+
 
 body {
     font-size: $base-font-size;
@@ -15,6 +17,11 @@ body {
     height: 100vh;
 }
 
+.main-header {
+    text-align: center;
+    font-family: $secondary-font;
+}
+
 .grid-item {
     display: flex;
     padding: 0.5em;
@@ -23,31 +30,54 @@ body {
 }
 
 .card {
-    display: flex;
-    flex-direction: column;
     border-radius: 0.5rem;
+    position: relative;
+    width: 48%;
+    margin: 0.5em auto;
+    max-height: $max-card-height;
     box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.3);
     -webkit-box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.3);
     -moz-box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.3);
-    width: 48%;
-    margin: 0.5em auto;
-    max-height: 600px;
+}
+
+.card-backdrop {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+}
+
+.card-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0.25em;
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    max-height: $max-card-height;
 }
 
 .card-head {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0.7em 0.5em;
+    text-align: center;
+    font-family: $secondary-font;
 }
 
-.card-img {
-    height: 200px;
-    object-fit: cover;
-    background-image: url('../images/madrid.jpeg');
-    background-size: contain;
-    background-repeat: no-repeat;
+.card-important {
+    padding: 0.25em 0;
+    font-size: 1.2em;
+    font-weight: 600;
+}
 
+.card-info-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.card-group {
+    margin: 0 0.25em;
 }
 
 .card-body {
@@ -63,8 +93,12 @@ body {
     margin: 0.75em 0.5em;
 }
 
-.main-header {
-    text-align: center;
+.info-note {
+    text-transform: uppercase;
+    font-size: 0.6em;
+    position: relative;
+    top: 7px;
+    font-weight: 600;
 }
 
 /* Apply to small devices */
