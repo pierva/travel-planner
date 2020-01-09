@@ -35,6 +35,7 @@ const view = {
             window.onresize = () => {
                 view.updateContainerHeight()
             }
+            view.addNote()
         })
     },
 
@@ -48,6 +49,27 @@ const view = {
                 containerHeight : imgHeight
         }
     },
+
+    addNote: () => {
+        // Don't use arrow function otherwise this won't be accessible
+        $('#mainContainer').on('click', '.note-btn', function (e) {
+            e.stopPropagation()
+            e.preventDefault()
+            const textArea = $('<textarea>')
+            textArea.addClass('note-text')
+            $(this).parent().append(textArea)
+                .append('<span class="fas fa-trash-alt delete-note btn btn-danger"></span>')
+            view.updateContainerHeight()
+        })
+
+        $('#mainContainer').on('click', '.delete-note', function (e) {
+            e.stopPropagation()
+            e.preventDefault()
+            $(this).prev('.note-text').remove()
+            $(this).remove()
+        })
+
+    }
 }
 
 // Export the application. In order to initiate the app, call 

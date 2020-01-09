@@ -57,7 +57,7 @@ h6 {
     font-weight: 600;
 }
 
-button {
+%button-default {
     padding: 0.25em 1.25em;
     font-size: 0.8em;
     cursor: pointer;
@@ -68,10 +68,18 @@ button {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
+button {
+    @extend %button-default;
+}
+
+.btn {
+    @extend %button-default;
+}
+
 .btn-primary {
     background-color: $primary-color;
     color: #dddddd;
-    border-color: $warning-color;
+    border-color: $primary-color;
 }
 
 .btn-primary:hover {
