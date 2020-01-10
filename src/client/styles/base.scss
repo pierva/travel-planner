@@ -65,15 +65,18 @@ body {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
   }
 
-.card {
-    border-radius: 0.5rem;
-    position: relative;
+%card-default {
     width: 48%;
     margin: 0.5em auto;
     max-height: $max-card-height;
     box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.3);
     -webkit-box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.3);
     -moz-box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.3);
+    border-radius: 0.5rem;
+}
+.card {
+    @extend %card-default;    
+    position: relative;
 }
 
 .card-backdrop {
@@ -129,6 +132,60 @@ body {
     margin: 0.75em 0.5em;
 }
 
+.new-card {
+    @extend %card-default;
+    background-color: rgba(104, 104, 104, 0.3);
+    min-height: 400px;
+    perspective: 1000px;
+}
+
+.new-card-btn {
+    cursor: pointer;
+    font-size: 5em;
+    height: 100px;
+    text-align: center;
+    line-height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    opacity: 0.5;
+    border: 1px solid rgb(104, 104, 104);
+    transition: opacity 0.5s;
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.new-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+}
+
+.new-card-front {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.new-card-front,
+.new-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.new-card-back {
+    background-color: #fff;
+    transform: rotateY(180deg);
+    border-radius: 0.5em;
+}
+
 .info-note {
     text-transform: uppercase;
     font-size: 0.6em;
@@ -166,7 +223,8 @@ body {
         padding: 0.5em;
     }
 
-    .card {
+    .card,
+    .new-card {
         width: 100%;
     }
 }

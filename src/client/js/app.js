@@ -36,6 +36,7 @@ const view = {
                 view.updateContainerHeight()
             }
             view.handleNote()
+            view.addNewTravel()
         })
     },
 
@@ -74,7 +75,14 @@ const view = {
             $(this).remove()
             view.updateContainerHeight()
         })
+    },
 
+    addNewTravel: () => {
+        $('.new-card-btn').on('click', function(e) {
+            e.preventDefault()
+            $('.new-card-inner').css('transform', 'rotateY(180deg)')
+            $(this).css('opacity', '0')
+        })
     }
 }
 
