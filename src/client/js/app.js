@@ -19,7 +19,7 @@ const model = {
 const octo = {
     init: () => {
         view.init()
-    },
+    }
 }
 
 /**
@@ -35,22 +35,26 @@ const view = {
             window.onresize = () => {
                 view.updateContainerHeight()
             }
-            view.addNote()
+            view.handleNote()
         })
     },
 
+    /**
+     * Dynamycally update the card containers height when the content 
+     * exceeds the card height
+     * 
+    */
     updateContainerHeight: () => {
         const containers = document.querySelectorAll('.card-container')
         for (let i = 0; i < containers.length; i++) {
             const parent = containers[i].parentElement
             const imgHeight = containers[i].previousElementSibling.offsetHeight
             const containerHeight = containers[i].offsetHeight
-            parent.style.height = containerHeight > imgHeight ?
-                containerHeight : imgHeight
+            parent.style.height = containerHeight
         }
     },
 
-    addNote: () => {
+    handleNote: () => {
         // Don't use arrow function otherwise this won't be accessible
         $('#mainContainer').on('click', '.note-btn', function (e) {
             e.stopPropagation()
@@ -62,11 +66,13 @@ const view = {
             view.updateContainerHeight()
         })
 
+        // Event listener to delete the notes
         $('#mainContainer').on('click', '.delete-note', function (e) {
             e.stopPropagation()
             e.preventDefault()
             $(this).prev('.note-text').remove()
             $(this).remove()
+            view.updateContainerHeight()
         })
 
     }
