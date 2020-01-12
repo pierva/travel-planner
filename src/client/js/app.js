@@ -44,6 +44,7 @@ const view = {
             view.showNewTravel()
             view.addNewTravel()
             view.closeNewCard()
+            view.deleteCard()
         })
     },
 
@@ -125,6 +126,37 @@ const view = {
             // $('.new-card-btn').css('opacity', '1')
             view.flipCard('.new-card-inner', undefined, 0, ()=> {
                 $('.new-card-btn').css('opacity', '1')
+            })
+        })
+    },
+
+    deleteCard: () => {
+        $('.delete-button').on('click', function(event) {
+            event.preventDefault()
+            const deleteBtn = $(this)
+            const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
+            $.confirm({
+                theme: 'material',
+                title: 'Delete trip',
+                content: `Are you sure you want to delete your trip to ${destination}?`,
+                confirmButtonClass: 'btn-danger',
+                useBootstrap: false,
+                boxWidth: '50%',
+                buttons: {
+                    delete: {
+                        text: 'Delete',
+                        btnClass: 'btn-danger',
+                        keys: ["enter"],
+                        action: () => {
+                            $('.new-card').css('height', '400px')
+                            $(deleteBtn).parent().remove()
+                        }
+
+                    },
+                    cancel: () => {
+                        return                        
+                    }
+                }
             })
         })
     }
