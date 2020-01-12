@@ -35,6 +35,11 @@ const view = {
             window.onresize = () => {
                 view.updateContainerHeight()
             }
+
+            // To initialize a datepicker (jQuery UI plugin), make sure you
+            // add the 'datepicker' class to the text input
+            $('.datepicker').datepicker()
+
             view.handleNote()
             view.addNewTravel()
         })
@@ -49,7 +54,7 @@ const view = {
         const containers = document.querySelectorAll('.card-container')
         for (let i = 0; i < containers.length; i++) {
             const parent = containers[i].parentElement
-            const imgHeight = containers[i].previousElementSibling.offsetHeight
+            // const imgHeight = containers[i].previousElementSibling.offsetHeight
             const containerHeight = containers[i].offsetHeight
             parent.style.height = containerHeight
         }
@@ -83,7 +88,9 @@ const view = {
             $('.new-card-inner').css('transform', 'rotateY(180deg)')
             $(this).css('opacity', '0')
         })
-    }
+    },
+
+    
 }
 
 // Export the application. In order to initiate the app, call 
