@@ -41,7 +41,9 @@ const view = {
             $('.datepicker').datepicker()
 
             view.handleNote()
+            view.showNewTravel()
             view.addNewTravel()
+            view.closeNewCard()
         })
     },
 
@@ -82,14 +84,50 @@ const view = {
         })
     },
 
-    addNewTravel: () => {
-        $('.new-card-btn').on('click', function(e) {
-            e.preventDefault()
-            $('.new-card-inner').css('transform', 'rotateY(180deg)')
-            $(this).css('opacity', '0')
+    showNewTravel: () => {
+        view.flipCard('.new-card-inner', '.new-card-btn', 180, ()=> {
+            $('.new-card-btn').css('opacity', '1')
         })
     },
 
+    /**
+     * @param {string} cardSelector inner card selector
+     * @param {string} btnSelector button that triggers the event (optional)
+     *                             pass undefined or null if you just want to 
+     *                             close the card
+     * @param {int} angle angle in degrees that defines how much the card 
+     *                    should be rotated
+     * @param {function} callback callback function
+     */
+    flipCard: (cardSelector, btnSelector, angle, callback) => {
+        if(!btnSelector) {
+            $(cardSelector).css('transform', `rotateY(${angle}deg)`)
+        }
+        $(btnSelector).on('click', function(e) {
+            e.preventDefault()
+            $(cardSelector).css('transform', `rotateY(${angle}deg)`)
+            if(callback) {
+                callback()
+            }
+        })
+    },
+
+    closeNewCard: () => {
+        view.flipCard('.new-card-inner', '#closeNewCard', 0, ()=> {
+            $('.new-card-btn').css('opacity', '1')
+        })
+    },
+
+    addNewTravel: () => {
+        $('#newTravel').on('submit', (event) => {
+            event.preventDefault();
+            // $('.new-card-inner').css('transform', 'rotateY(0deg)')
+            // $('.new-card-btn').css('opacity', '1')
+            view.flipCard('.new-card-inner', undefined, 0, ()=> {
+                $('.new-card-btn').css('opacity', '1')
+            })
+        })
+    }
     
 }
 

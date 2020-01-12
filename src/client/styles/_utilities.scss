@@ -144,3 +144,26 @@ button {
     color: #fff;
     box-shadow: 0px 0px 3px 1px $danger-color;
 }
+
+.required::after {
+    content: '*';
+    color: red;
+    position: relative;
+    top: -3px;
+}
+
+.close {
+    position: absolute;
+    right: 0;
+    font-size: 2em;
+    color: $light-grey;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+
+    &:hover {
+        color: $primary-color;
+    }
+}
