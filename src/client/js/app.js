@@ -8,7 +8,7 @@
 * The model holds all the front end data
 */
 const model = {
-    travels: {}
+    travels: []
 }
 
 /**
@@ -41,7 +41,7 @@ const octo = {
         const obj = {}
         obj.id = octo.uuidv4()
         obj.data = data
-        model.travels = obj
+        model.travels.push(obj)
         return obj.id
     },
 
@@ -50,11 +50,11 @@ const octo = {
      * @param {string} [uuidv4] optional id, if no id is provided the
      *                          function returns all the travels in the
      *                          model 
-     * @returns {Object || undefined}
+     * @returns {array} 
     */
     getTravelPlan: (id) => {
         if(!id) return model.travels
-        return model.travels[id]
+        return model.travels.filter((el) => el.id === id)
     },
 
     /**
@@ -67,6 +67,28 @@ const octo = {
         if(model.travels[id]) {
             return delete model.travels[id]
         }
+    },
+
+    /**
+     * arrayToKeyedObj takes an array and returns a keyed object based
+     * on the key passed as parameter 
+     * @param {array} array array of objects with data to be converted
+     * @param {string} key key of the inner object to access the value needed
+     *                     to the keyed json. 
+     *                     Example:
+     *                       input array [{name: "Piervalerio", city: "Miami"}]
+     *                       if the key is name, the output will be
+     *                       {Piervalerio: {name: "Piervalerio", city: "Miami"}}
+     * @returns {Object} empty object if the arguments are not provided
+    */
+    arrayToKeyedObj: (array, key) => {
+        if(!key || !array || array.length === 0) return {}
+        const obj = {}
+        $.each(array, function(index, elem) {
+            const objKey = elem[key] || index
+            obj[objKey] = elem
+        })
+        return obj
     }
 }
 
@@ -88,6 +110,7 @@ const view = {
             // add the 'datepicker' class to the text input
             $('.datepicker').datepicker()
 
+            // Add event listeners
             view.handleNote()
             view.showNewTravel()
             view.addNewTravel()
@@ -174,8 +197,7 @@ const view = {
                 $('.new-card-btn').css('opacity', '1')
             })
             const userInputs = $(this).serializeArray()
-            octo.addTravelPlan(userInputs)
-            console.log(model)
+            const id = octo.addTravelPlan(userInputs)
         })
     },
 
