@@ -249,6 +249,10 @@ body {
     text-align: center;
 }
 
+.jconfirm-box {
+    border-top: 5px solid $danger-color;
+}
+
 /* Apply to small devices */
 @media (max-width: 768px) {
     body {
