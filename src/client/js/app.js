@@ -198,6 +198,50 @@ const view = {
             })
             const userInputs = $(this).serializeArray()
             const id = octo.addTravelPlan(userInputs)
+            const inputs = octo.arrayToKeyedObj(userInputs, 'name')
+            console.log(inputs);
+            
+            $('#mainContainer').prepend(
+                `<div class="card" data-travelid="${id}">
+                <span class="delete-button fas fa-trash-alt"></span>
+                <img class="card-backdrop"
+                    src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60">
+                <div class="card-container">
+                    <h2 class="card-head" data-destination="${inputs.travelDestination.value}">
+                    Trip to: ${inputs.travelDestination.value}
+                    </h2>
+                    <div class="card-important">Departing:</div>
+                    <div>${inputs.depDate.value} - 150d 20h 19m</div>
+                    <hr class="separator">
+                    <div class="card-info-group">
+                        <div>
+                            <h6>Flight Details:</h6>
+                            <button class="btn-warning">Edit</button>
+                            <button class="btn-danger">Delete</button>
+                        </div>
+                        <div class="card-group">
+                            <div class="info-note">Origin</div>
+                            <div>${inputs.flightOrigin.value} ${inputs.depDate.value} ${inputs.originTime.value}</div>
+                            <div class="info-note">Destination</div>
+                            <div>${inputs.flightDestination.value} ${inputs.arrDate.value} ${inputs.arrivalTime.value}</div>
+                            <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
+                        </div>
+
+                    </div>
+                    <hr class="separator">
+                    <div class="card-group">
+                        <div class="card-important">Tipical Weather for travel date</div>
+                        <div>High 25deg | Low 12deg</div>
+                    </div>
+                    <div class="note-group">
+                        <button class="btn-primary note-btn">
+                            <span class="fas fa-plus"></span>
+                            <span>Add Note</span>
+                        </button>
+                    </div>
+                </div>
+            </div>`
+            )
         })
     },
 
