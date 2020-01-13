@@ -8,7 +8,7 @@
 * The model holds all the front end data
 */
 const model = {
-
+    travels: {}
 }
 
 /**
@@ -19,6 +19,54 @@ const model = {
 const octo = {
     init: () => {
         view.init()
+    },
+    /**
+     * Function taken from Stackoverflow https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+     * @returns {string} uuid v4 - 16chars
+     */
+    uuidv4:() => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      },
+
+    /**
+    * Add new travel plan
+    * @param {array} data Array of objects containing user inputs
+    * @returns {string} uuid of the newly added travel 
+    */ 
+    addTravelPlan: (data) => {
+        if(!data) return false
+        const obj = {}
+        obj.id = octo.uuidv4()
+        obj.data = data
+        model.travels = obj
+        return obj.id
+    },
+
+    /**
+     * get travel data from the model.
+     * @param {string} [uuidv4] optional id, if no id is provided the
+     *                          function returns all the travels in the
+     *                          model 
+     * @returns {Object || undefined}
+    */
+    getTravelPlan: (id) => {
+        if(!id) return model.travels
+        return model.travels[id]
+    },
+
+    /**
+     * delete a travel plan from the model
+     * @param {string} uuidv4 travel id
+     * @returns {boolean} 
+    */
+    deleteTravelPlan: (id) => {
+        if(!id) return false
+        if(model.travels[id]) {
+            return delete model.travels[id]
+        }
     }
 }
 
@@ -120,13 +168,14 @@ const view = {
     },
 
     addNewTravel: () => {
-        $('#newTravel').on('submit', (event) => {
+        $('#newTravel').on('submit', function (event) {
             event.preventDefault();
-            // $('.new-card-inner').css('transform', 'rotateY(0deg)')
-            // $('.new-card-btn').css('opacity', '1')
             view.flipCard('.new-card-inner', undefined, 0, ()=> {
                 $('.new-card-btn').css('opacity', '1')
             })
+            const userInputs = $(this).serializeArray()
+            octo.addTravelPlan(userInputs)
+            console.log(model)
         })
     },
 
