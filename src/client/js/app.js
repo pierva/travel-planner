@@ -201,7 +201,7 @@ const view = {
             const inputs = octo.arrayToKeyedObj(userInputs, 'name')
             const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
             const timeToNow = moment().to(depMoment)
-            const arrDate = "N/A"
+            let arrDate = "N/A"
             if(inputs.arrDate.value !== "") {
                 const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
                 arrDate= arrMoment.format('DDMMM').toUpperCase()
