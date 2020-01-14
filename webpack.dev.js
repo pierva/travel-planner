@@ -1,8 +1,9 @@
 const path = require('path')
 const webpack = require('webpack')
+const moment = require('moment')
 const HtmlWebPackPlugin = require("html-webpack-plugin")
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 
 module.exports = {
     entry: './src/client/index.js',
@@ -43,7 +44,11 @@ module.exports = {
             // Automatically remove all unused webpack assets on rebuild
             cleanStaleWebpackAssets: true,
             protectWebpackAssets: false
-        })
+        }),
+        new webpack.ProvidePlugin({
+            moment: 'moment'
+        }),
+        new MomentLocalesPlugin()
     ],
     devServer: {
         historyApiFallback: true

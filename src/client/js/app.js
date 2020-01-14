@@ -116,6 +116,7 @@ const view = {
             view.addNewTravel()
             view.closeNewCard()
             view.deleteCard()
+            console.log(moment().format());
         })
     },
 
@@ -199,7 +200,7 @@ const view = {
             const userInputs = $(this).serializeArray()
             const id = octo.addTravelPlan(userInputs)
             const inputs = octo.arrayToKeyedObj(userInputs, 'name')
-            console.log(inputs);
+            
             
             $('#mainContainer').prepend(
                 `<div class="card" data-travelid="${id}">
