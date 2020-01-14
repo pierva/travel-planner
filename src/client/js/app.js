@@ -116,7 +116,6 @@ const view = {
             view.addNewTravel()
             view.closeNewCard()
             view.deleteCard()
-            console.log(moment().format());
         })
     },
 
@@ -200,8 +199,13 @@ const view = {
             const userInputs = $(this).serializeArray()
             const id = octo.addTravelPlan(userInputs)
             const inputs = octo.arrayToKeyedObj(userInputs, 'name')
-            
-            
+            const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
+            const timeToNow = moment().to(depMoment)
+            const arrDate = "N/A"
+            if(inputs.arrDate.value !== "") {
+                const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
+                arrDate= arrMoment.format('DDMMM').toUpperCase()
+            } 
             $('#mainContainer').prepend(
                 `<div class="card" data-travelid="${id}">
                 <span class="delete-button fas fa-trash-alt"></span>
@@ -212,7 +216,7 @@ const view = {
                     Trip to: ${inputs.travelDestination.value}
                     </h2>
                     <div class="card-important">Departing:</div>
-                    <div>${inputs.depDate.value} - 150d 20h 19m</div>
+                    <div>${depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
                     <hr class="separator">
                     <div class="card-info-group">
                         <div>
@@ -222,9 +226,9 @@ const view = {
                         </div>
                         <div class="card-group">
                             <div class="info-note">Origin</div>
-                            <div>${inputs.flightOrigin.value} ${inputs.depDate.value} ${inputs.originTime.value}</div>
+                            <div>${inputs.flightOrigin.value} ${depMoment.format('DDMMM').toUpperCase()} ${inputs.originTime.value}</div>
                             <div class="info-note">Destination</div>
-                            <div>${inputs.flightDestination.value} ${inputs.arrDate.value} ${inputs.arrivalTime.value}</div>
+                            <div>${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}</div>
                             <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
                         </div>
 
