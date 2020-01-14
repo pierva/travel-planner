@@ -128,7 +128,6 @@ const view = {
         const containers = document.querySelectorAll('.card-container')
         for (let i = 0; i < containers.length; i++) {
             const parent = containers[i].parentElement
-            // const imgHeight = containers[i].previousElementSibling.offsetHeight
             const containerHeight = containers[i].offsetHeight
             parent.style.height = containerHeight
         }
@@ -190,22 +189,40 @@ const view = {
         })
     },
 
+    datesValidation: (duration, retDateSelector) => {
+        if(duration < 0) {
+            $.alert({
+                title: 'Invalid Date',
+                theme: 'material',
+                content: 'The returning date is earlier than the departure date.',
+                useBootstrap: false,
+                boxWidth: '50%',
+            })
+            $(retDateSelector).val("")
+            return false
+        }
+        return true
+    },
+
     addNewTravel: () => {
         $('#newTravel').on('submit', function (event) {
             event.preventDefault();
-            view.flipCard('.new-card-inner', undefined, 0, ()=> {
-                $('.new-card-btn').css('opacity', '1')
-            })
+            
             const userInputs = $(this).serializeArray()
             const id = octo.addTravelPlan(userInputs)
             const inputs = octo.arrayToKeyedObj(userInputs, 'name')
             const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
             const timeToNow = moment().to(depMoment)
             let arrDate = "N/A"
+            const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
+            if(!view.datesValidation(duration, "[name='retDate']")) return
             if(inputs.arrDate.value !== "") {
                 const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
                 arrDate= arrMoment.format('DDMMM').toUpperCase()
             } 
+            view.flipCard('.new-card-inner', undefined, 0, ()=> {
+                $('.new-card-btn').css('opacity', '1')
+            })
             $('#mainContainer').prepend(
                 `<div class="card" data-travelid="${id}">
                 <span class="delete-button fas fa-trash-alt"></span>
@@ -213,7 +230,7 @@ const view = {
                     src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60">
                 <div class="card-container">
                     <h2 class="card-head" data-destination="${inputs.travelDestination.value}">
-                    Trip to: ${inputs.travelDestination.value}
+                    ${duration} days to ${inputs.travelDestination.value}
                     </h2>
                     <div class="card-important">Departing:</div>
                     <div>${depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
@@ -226,9 +243,13 @@ const view = {
                         </div>
                         <div class="card-group">
                             <div class="info-note">Origin</div>
-                            <div>${inputs.flightOrigin.value} ${depMoment.format('DDMMM').toUpperCase()} ${inputs.originTime.value}</div>
+                            <div class="text-uppercase">
+                            ${inputs.flightOrigin.value} ${depMoment.format('DDMMM')} ${inputs.originTime.value}
+                            </div>
                             <div class="info-note">Destination</div>
-                            <div>${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}</div>
+                            <div class="text-uppercase">
+                            ${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}
+                            </div>
                             <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
                         </div>
 
@@ -251,7 +272,7 @@ const view = {
     },
 
     deleteCard: () => {
-        $('.delete-button').on('click', function(event) {
+        $('#mainContainer').on('click', '.delete-button', function(event) {
             event.preventDefault()
             const deleteBtn = $(this)
             const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
