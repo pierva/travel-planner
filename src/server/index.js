@@ -23,8 +23,7 @@ app.use(express.static('dist'))
 
 // Serve the home page
 app.get('/', function (req, res) {
-    // res.sendFile('./dist/index.html')
-    res.send('I am running!')
+    res.sendFile('./dist/index.html')
 })
 
 // Start the server
