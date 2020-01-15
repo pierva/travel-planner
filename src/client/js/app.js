@@ -8,7 +8,9 @@
 * The model holds all the front end data
 */
 const model = {
-    travels: []
+    travels: [],
+    geonamesURI: 'http://api.geonames.org/geoCodeAddressJSON?q=',
+    geonamesUser: 'piervalerio'
 }
 
 /**
@@ -89,6 +91,19 @@ const octo = {
             obj[objKey] = elem
         })
         return obj
+    },
+
+    /**
+     * This async function return a geocoded address using the 
+     * geonames api
+     * @param {string} address
+     * @returns {Promise}
+    */
+    getLocationCoordinates: async (address) => {
+        const URI = encodeURI(model.geonamesURI+address+'&username='+model.geonamesUser)
+        let response = await fetch(URI)
+        let data = await response.json()
+        return data
     }
 }
 
@@ -268,6 +283,8 @@ const view = {
             </div>`
             )
             view.updateContainerHeight()
+            octo.getLocationCoordinates(inputs.travelDestination.value)
+                .then((data) => console.log(data))
         })
     },
 
