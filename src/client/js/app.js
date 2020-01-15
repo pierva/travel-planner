@@ -226,8 +226,7 @@ const view = {
             $('#mainContainer').prepend(
                 `<div class="card" data-travelid="${id}">
                 <span class="delete-button fas fa-trash-alt"></span>
-                <img class="card-backdrop"
-                    src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60">
+                <div class="card-backdrop"></div>
                 <div class="card-container">
                     <h2 class="card-head" data-destination="${inputs.travelDestination.value}">
                     ${duration} days to ${inputs.travelDestination.value}
@@ -268,6 +267,7 @@ const view = {
                 </div>
             </div>`
             )
+            view.updateContainerHeight()
         })
     },
 
