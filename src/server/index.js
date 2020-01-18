@@ -80,13 +80,26 @@ app.post('/weather', async (req, res) => {
     }
 })
 
-// pixabay sample url
-// https://pixabay.com/api/?key=YOUR-KEY&q=madrid&image_type=photo&safesearch=true
+/**
+ * The /pictures endpoint makes a get request to the pixabay api to 
+ * retrieve photos of the destination passed in the request parameters
+ * If no destination is provided, the endpoin will return an error
+ * pixabay sample url
+ * https://pixabay.com/api/?key=YOUR-KEY&q=madrid&image_type=photo&safesearch=true
+*/
 app.get('/pictures/:destination', async (req, res) => {
-    const destination = req.params 
-    if(!destination || destination.trim() === "") {
+    const{ destination} = req.params
+    if(destination === 'undefined') {
+        console.log('im here')
         return res.status(400).json({
             error: 'No destination provided',
+            status: 400
+        })
+    }
+    if(destination.trim() === "") {
+        console.log('here')
+        return res.status(400).json({
+            error: 'Invalid destination',
             status: 400
         })
     }
