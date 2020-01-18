@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const fetch = require('node-fetch')
 
 
 // Configure environment variables
@@ -49,9 +50,9 @@ app.post('/weather', async (req, res) => {
     let daysToNow = 0
     if (time) {
         const diff = new Date(time) - new Date()
-        daysToNow = diff/36e5/24
+        daysToNow = diff / 36e5 / 24
     }
-    if(!lat || !lon){
+    if (!lat || !lon) {
         return res.send({
             error: 'Invalid coordinates',
             status: 400
@@ -59,7 +60,7 @@ app.post('/weather', async (req, res) => {
     }
     try {
         const forecast = await darksky
-        // If within 3 days, exclude time
+            // If within 3 days, exclude time
             .options({
                 latitude: lat,
                 longitude: lon,
@@ -69,19 +70,34 @@ app.post('/weather', async (req, res) => {
             })
             .get()
         res.status(200).json(forecast)
-    } catch (err){
+    } catch (err) {
         return res.json(
             {
-                error: 'Darksky API error', 
+                error: 'Darksky API error',
                 message: err
             }
-            )
+        )
     }
 })
 
+// pixabay sample url
+// https://pixabay.com/api/?key=YOUR-KEY&q=madrid&image_type=photo&safesearch=true
+app.get('/pictures/:destination', async (req, res) => {
+    const destination = req.params 
+    const URI = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${destination}&image_type=photo&safesearch=true`
+    let apiRes = await fetch(URI)
+    let data = await apiRes.json()
+    if(data) {
+        return res.status(200).json(data)
+    }
+    res.json({error: 'Pixabay API error'})
+})
+
+
 // Start the server
-app.listen(process.env.PORT || PORT, function(){
-    console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
-  });
+app.listen(process.env.PORT || PORT, function () {
+    console.log("Express server listening on port %d in %s mode", 
+        this.address().port, app.settings.env);
+});
 
 module.exports = app
