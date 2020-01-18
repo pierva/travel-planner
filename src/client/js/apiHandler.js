@@ -56,8 +56,8 @@ const apiHandler = {
                 status: 400
             }
         }
-        let coordinates = await apiHandler.geolocator(address)
-        coordinates.time = date
+        let res = await apiHandler.geolocator(address)
+        res.time = date
 
         const response = await fetch(apiStatic.baseUrl + '/weather', {
             method: 'POST',
@@ -66,17 +66,36 @@ const apiHandler = {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(coordinates)
+            body: JSON.stringify(res)
         })
 
         try {
             const data = await response.json()
-            console.log(data)
             return data
         } catch (error) {
-            console.log(error);
             return error
         }
+    },
+
+    /**
+     * getImage is a get request to the backend server.
+     * The server will handle the call to pixabay api if a destination 
+     * is provided
+     * 
+     * @param {String} destination Place we would like the pictures of
+     * @return {Promise}
+     */
+    getImages: async (destination) => {
+        if(!destination || destination.trim === "") {
+            return {
+                error: 'No destination provided',
+                status: 400
+            }
+        }
+        const URI = encodeURI(apiStatic.baseUrl + '/pictures/' + destination)
+        let response = await fetch(URI)
+        let data = await response.json()
+        return data 
     }
 }
 
