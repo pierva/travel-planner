@@ -216,6 +216,7 @@ const view = {
             const inputs = octo.arrayToKeyedObj(userInputs, 'name')
             const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
             const timeToNow = moment().to(depMoment)
+            const destination = inputs.travelDestination.value
             let arrDate = "N/A"
             const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
             if(!view.datesValidation(duration, "[name='retDate']")) return
@@ -231,8 +232,8 @@ const view = {
                 <span class="delete-button fas fa-trash-alt"></span>
                 <div class="card-backdrop"></div>
                 <div class="card-container">
-                    <h2 class="card-head" data-destination="${inputs.travelDestination.value}">
-                    ${duration} days to ${inputs.travelDestination.value}
+                    <h2 class="card-head" data-destination="${destination}">
+                    ${duration} days to ${destination}
                     </h2>
                     <div class="card-important">Departing:</div>
                     <div>${depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
@@ -271,12 +272,13 @@ const view = {
             </div>`
             )
             view.updateContainerHeight()
-            Client.apiHandler.getWeather(
-                inputs.travelDestination.value, depMoment)
+            Client.apiHandler.getWeather(destination, depMoment)
                 .then((data) => console.log(data))
                 /**
                  * TODO: display weather data to the user with icons
                  */
+            Client.apiHandler.getImages(destination)
+                .then((data) => console.log(data))
         })
     },
 
