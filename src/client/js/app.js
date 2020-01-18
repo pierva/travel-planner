@@ -9,7 +9,9 @@
 */
 const model = {
     travels: [],
-
+    /**
+     * TODO: Save travels in local storage
+     */
 }
 
 /**
@@ -272,6 +274,9 @@ const view = {
             Client.apiHandler.getWeather(
                 inputs.travelDestination.value, depMoment)
                 .then((data) => console.log(data))
+                /**
+                 * TODO: display weather data to the user with icons
+                 */
         })
     },
 
