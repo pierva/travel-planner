@@ -53,7 +53,7 @@ app.post('/weather', async (req, res) => {
         daysToNow = diff / 36e5 / 24
     }
     if (!lat || !lon) {
-        return res.send({
+        return res.status(400).send({
             error: 'Invalid coordinates',
             status: 400
         })
@@ -84,6 +84,12 @@ app.post('/weather', async (req, res) => {
 // https://pixabay.com/api/?key=YOUR-KEY&q=madrid&image_type=photo&safesearch=true
 app.get('/pictures/:destination', async (req, res) => {
     const destination = req.params 
+    if(!destination || destination.trim() === "") {
+        return res.status(400).json({
+            error: 'No destination provided',
+            status: 400
+        })
+    }
     const URI = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${destination}&image_type=photo&safesearch=true`
     let apiRes = await fetch(URI)
     let data = await apiRes.json()
