@@ -7,6 +7,12 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 
 module.exports = {
     entry: './src/client/index.js',
+    devtool: 'source-map',
+    stats: 'verbose',
+    output: {
+        libraryTarget: 'var',
+        library: 'Client'
+    },
     module: {
         rules: [
             {
