@@ -192,12 +192,18 @@ const view = {
         })
     },
 
+    /**
+     * @param {int} duration
+     * @param {string} retDateSelector jquery selector of the return 
+     *                                 date input element
+     * @returns {boolean}
+     */
     datesValidation: (duration, retDateSelector) => {
         if (duration < 0) {
             $.alert({
                 title: 'Invalid Date',
                 theme: 'material',
-                content: 'The returning date is earlier than the departure date.',
+                content: 'The return date is earlier than the departure date.',
                 useBootstrap: false,
                 boxWidth: '50%',
             })
@@ -207,7 +213,14 @@ const view = {
         return true
     },
 
-    updateBackgroundImage: (travelid, imgData, slideShow = false) => {
+    /**
+     * @param {string} travelid uuid v4
+     * @param {array} imgData response data from pixabay api
+     * 
+     * @returns {boolean}
+    */
+
+    updateBackgroundImage: (travelid, imgData) => {
         if (!travelid || !imgData || imgData.totalHits === 0) return false
         const $imgDiv = $(`[data-travelid=${travelid}]`).find('.card-backdrop')
         // no img div found
@@ -290,7 +303,7 @@ const view = {
              */
             Client.apiHandler.getImages(destination)
                 .then((data) => {
-                    view.updateBackgroundImage(id, data, true)
+                    view.updateBackgroundImage(id, data)
                 })
         })
     },
