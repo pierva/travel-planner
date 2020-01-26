@@ -27,20 +27,20 @@ const octo = {
      * Function taken from Stackoverflow https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
      * @returns {string} uuid v4 - 16chars
      */
-    uuidv4:() => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
+    uuidv4: () => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
         });
-      },
+    },
 
     /**
     * Add new travel plan
     * @param {array} data Array of objects containing user inputs
     * @returns {string} uuid of the newly added travel 
-    */ 
+    */
     addTravelPlan: (data) => {
-        if(!data) return false
+        if (!data) return false
         const obj = {}
         obj.id = octo.uuidv4()
         obj.data = data
@@ -56,7 +56,7 @@ const octo = {
      * @returns {array} 
     */
     getTravelPlan: (id) => {
-        if(!id) return model.travels
+        if (!id) return model.travels
         return model.travels.filter((el) => el.id === id)
     },
 
@@ -66,8 +66,8 @@ const octo = {
      * @returns {boolean} 
     */
     deleteTravelPlan: (id) => {
-        if(!id) return false
-        if(model.travels[id]) {
+        if (!id) return false
+        if (model.travels[id]) {
             return delete model.travels[id]
         }
     },
@@ -85,9 +85,9 @@ const octo = {
      * @returns {Object} empty object if the arguments are not provided
     */
     arrayToKeyedObj: (array, key) => {
-        if(!key || !array || array.length === 0) return {}
+        if (!key || !array || array.length === 0) return {}
         const obj = {}
-        $.each(array, function(index, elem) {
+        $.each(array, function (index, elem) {
             const objKey = elem[key] || index
             obj[objKey] = elem
         })
@@ -159,7 +159,7 @@ const view = {
     },
 
     showNewTravel: () => {
-        view.flipCard('.new-card-inner', '.new-card-btn', 180, ()=> {
+        view.flipCard('.new-card-inner', '.new-card-btn', 180, () => {
             $('.new-card-btn').css('opacity', '1')
         })
     },
@@ -174,26 +174,26 @@ const view = {
      * @param {function} callback callback function
      */
     flipCard: (cardSelector, btnSelector, angle, callback) => {
-        if(!btnSelector) {
+        if (!btnSelector) {
             $(cardSelector).css('transform', `rotateY(${angle}deg)`)
         }
-        $(btnSelector).on('click', function(e) {
+        $(btnSelector).on('click', function (e) {
             e.preventDefault()
             $(cardSelector).css('transform', `rotateY(${angle}deg)`)
-            if(callback) {
+            if (callback) {
                 callback()
             }
         })
     },
 
     closeNewCard: () => {
-        view.flipCard('.new-card-inner', '#closeNewCard', 0, ()=> {
+        view.flipCard('.new-card-inner', '#closeNewCard', 0, () => {
             $('.new-card-btn').css('opacity', '1')
         })
     },
 
     datesValidation: (duration, retDateSelector) => {
-        if(duration < 0) {
+        if (duration < 0) {
             $.alert({
                 title: 'Invalid Date',
                 theme: 'material',
@@ -207,10 +207,21 @@ const view = {
         return true
     },
 
+    updateBackgroundImage: (travelid, imgData, slideShow = false) => {
+        if (!travelid || !imgData || imgData.totalHits === 0) return false
+        const $imgDiv = $(`[data-travelid=${travelid}]`).find('.card-backdrop')
+        // no img div found
+        if ($imgDiv.length === 0) return false
+
+        const hits = imgData.hits
+        $imgDiv.css('background-image', `url("${hits[0].webformatURL}")`)
+        return true
+    },
+
     addNewTravel: () => {
         $('#newTravel').on('submit', function (event) {
             event.preventDefault();
-            
+
             const userInputs = $(this).serializeArray()
             const id = octo.addTravelPlan(userInputs)
             const inputs = octo.arrayToKeyedObj(userInputs, 'name')
@@ -219,12 +230,12 @@ const view = {
             const destination = inputs.travelDestination.value
             let arrDate = "N/A"
             const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
-            if(!view.datesValidation(duration, "[name='retDate']")) return
-            if(inputs.arrDate.value !== "") {
+            if (!view.datesValidation(duration, "[name='retDate']")) return
+            if (inputs.arrDate.value !== "") {
                 const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
-                arrDate= arrMoment.format('DDMMM').toUpperCase()
-            } 
-            view.flipCard('.new-card-inner', undefined, 0, ()=> {
+                arrDate = arrMoment.format('DDMMM').toUpperCase()
+            }
+            view.flipCard('.new-card-inner', undefined, 0, () => {
                 $('.new-card-btn').css('opacity', '1')
             })
             $('#mainContainer').prepend(
@@ -274,16 +285,18 @@ const view = {
             view.updateContainerHeight()
             Client.apiHandler.getWeather(destination, depMoment)
                 .then((data) => console.log(data))
-                /**
-                 * TODO: display weather data to the user with icons
-                 */
+            /**
+             * TODO: display weather data to the user with icons
+             */
             Client.apiHandler.getImages(destination)
-                .then((data) => console.log(data))
+                .then((data) => {
+                    view.updateBackgroundImage(id, data, true)
+                })
         })
     },
 
     deleteCard: () => {
-        $('#mainContainer').on('click', '.delete-button', function(event) {
+        $('#mainContainer').on('click', '.delete-button', function (event) {
             event.preventDefault()
             const deleteBtn = $(this)
             const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
@@ -306,13 +319,13 @@ const view = {
 
                     },
                     cancel: () => {
-                        return                        
+                        return
                     }
                 }
             })
         })
     }
-    
+
 }
 
 // Export the application. In order to initiate the app, call 
