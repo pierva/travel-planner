@@ -231,6 +231,34 @@ const view = {
         return true
     },
 
+    displayWeather: (travelId, weatherData) => {
+        const $div = $(`[data-travelid=${travelId}]`).find('.weather')
+        if (!travelId || !weatherData) {
+            $div.next().text('Unable to update weather information.')
+            return
+        }
+        const $header = $div.find('.card-important').find('span')
+
+        // Departure date within 3 days from today
+        weatherData.daily.data.length > 1 ? $header.text('Forecasted') : $header.text('Tipical')
+
+        const $container = $('<div>').addClass('card-info-group')
+        $.each(weatherData.daily.data, (index, elem) => {
+            $container.append(`
+                <div class="card-group">
+                    <div>${moment.unix(elem.time).format('MMM DD')}</div>    
+                    <div><span class="${elem.icon}"></span></div>
+                    <div>
+                        <span>${Math.floor(elem.temperatureLow)}°C</span>
+                        <span>/${Math.floor(elem.temperatureHigh)}°C</span>
+                    </div>  
+                    <div>${(elem.windSpeed * 3.6).toFixed(1)}km/h - ${elem.windBearing}°</div>
+                </div>`)
+        })
+        $div.append($container)
+        view.updateContainerHeight()
+    },
+
     addNewTravel: () => {
         $('#newTravel').on('submit', function (event) {
             event.preventDefault();
@@ -282,9 +310,9 @@ const view = {
 
                     </div>
                     <hr class="separator">
-                    <div class="card-group">
-                        <div class="card-important">Tipical Weather for travel date</div>
-                        <div>High 25deg | Low 12deg</div>
+                    <div class="card-group weather">
+                        <div class="card-important">
+                        <span>Tipical</span> weather for travel date</div>
                     </div>
                     <div class="note-group">
                         <button class="btn-primary note-btn">
@@ -297,10 +325,11 @@ const view = {
             )
             view.updateContainerHeight()
             Client.apiHandler.getWeather(destination, depMoment)
-                .then((data) => console.log(data))
-            /**
-             * TODO: display weather data to the user with icons
-             */
+                .then((data) => {
+                    console.log(data)
+                    view.displayWeather(id, data)
+                })
+
             Client.apiHandler.getImages(destination)
                 .then((data) => {
                     view.updateBackgroundImage(id, data)
