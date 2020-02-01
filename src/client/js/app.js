@@ -29,10 +29,7 @@ const model = {
             'climacon': 'lightning'
         }
     ],
-    travels: [],
-    /**
-     * TODO: Save travels in local storage
-     */
+    travels: []
 }
 
 /**
@@ -56,7 +53,7 @@ const octo = {
     },
 
     /**
-    * Add new travel plan
+    * Add new travel plan in the model and localStorage
     * @param {array} data Array of objects containing user inputs
     * @returns {string} uuid of the newly added travel 
     */
@@ -66,6 +63,7 @@ const octo = {
         obj.id = octo.uuidv4()
         obj.data = data
         model.travels.push(obj)
+        octo.saveToLocalStorage('travels', model.travels)
         return obj.id
     },
 
@@ -164,7 +162,60 @@ const octo = {
         } else {
             return "N";
         }
-    }
+    },
+
+    /** 
+     * function taken from MDN docs. It checks if local or session storage is
+     * available
+     * @param {string} [type=localStorage] The type of storage to check ex.: 'localStorage'
+     *                                     default 'localStorage'
+     * @returns {boolean | DOMException}                      
+    */
+    storageAvailable: function (type = 'localStorage') {
+        let storage;
+        try {
+            storage = window[type];
+            const x = '__storage_test__';
+            storage.setItem(x, x);
+            storage.removeItem(x);
+            return true;
+        }
+        catch (e) {
+            return e instanceof DOMException && (
+                // everything except Firefox
+                e.code === 22 ||
+                // Firefox
+                e.code === 1014 ||
+                // test name field too, because code might not be present
+                // everything except Firefox
+                e.name === 'QuotaExceededError' ||
+                // Firefox
+                e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+                // acknowledge QuotaExceededError only if there's something already stored
+                (storage && storage.length !== 0);
+        }
+    },
+
+    /**
+     * @param {name} name The name to be used by the setItem function
+     * @param {array} value 
+     * 
+     * @returns {boolean}
+     */
+    saveToLocalStorage: (name, value) => {
+        try {
+          // Clear all values previously saved
+          localStorage.clear();
+    
+          if (octo.storageAvailable()) {
+            localStorage.setItem(name, JSON.stringify(value))
+            return true;
+          }
+        } catch (e) {
+          console.log(e);
+          return false;
+        }
+      },
 }
 
 /**
