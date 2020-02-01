@@ -81,14 +81,21 @@ const octo = {
 
     /**
      * delete a travel plan from the model
-     * @param {string} uuidv4 travel id
+     * @param {string} id travel id uuid4
      * @returns {boolean} 
     */
     deleteTravelPlan: (id) => {
         if (!id) return false
-        if (model.travels[id]) {
-            return delete model.travels[id]
+        const index = model.travels.findIndex((elem) => elem.id === id)
+        if(index === -1) return false
+
+        // delete travel from local model
+        if (model.travels[index]) {
+            delete model.travels[index]
         }
+        // update localStorage
+        octo.saveToLocalStorage(model.travels)
+        return true
     },
 
     /**
@@ -458,7 +465,6 @@ const view = {
             window.scrollTo({top: 100, left: 100, behavior: 'smooth'})
             Client.apiHandler.getWeather(destination, depMoment)
                 .then((data) => {
-                    console.log(data)
                     view.displayWeather(id, data)
                 })
 
@@ -474,6 +480,7 @@ const view = {
             event.preventDefault()
             const deleteBtn = $(this)
             const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
+            const travelId = deleteBtn.parent().data('travelid')
             $.confirm({
                 theme: 'material',
                 title: 'Delete trip',
@@ -489,6 +496,7 @@ const view = {
                         action: () => {
                             $('.new-card').css('height', '400px')
                             $(deleteBtn).parent().remove()
+                            octo.deleteTravelPlan(travelId)
                         }
 
                     },
