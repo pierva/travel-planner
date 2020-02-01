@@ -257,6 +257,39 @@ body {
     border-top: 5px solid $danger-color;
 }
 
+.icon {
+    font-size: 2em;
+    color: $warning-color;
+    text-align: center;
+}
+
+.weather {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 0.5em;
+}
+
+.weather-date {
+    font-weight: 600;
+}
+
+.unit {
+    font-size: 0.5em;
+    margin-top: 4px;
+}
+
+.weather-group {
+    margin: 0 0.25em;
+    text-align: center;
+}
+
+.min {
+    color: $min-blue;
+}
+
+.max {
+    color: $max-orange;
+}
+
 /* Apply to small devices */
 @media (max-width: 768px) {
     body {
