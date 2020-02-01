@@ -121,7 +121,7 @@ const octo = {
      * @returns {String} returns the matching climacon icon
      */
     getClimacons: (darkSkyIcon) => {
-        if(!darkSkyIcon || darkSkyIcon.trim().length < 1) return ''
+        if (!darkSkyIcon || darkSkyIcon.trim().length < 1) return ''
         const odds = model.darkSkyClimaconMap
         const found = odds.find(elem => elem.darkcon === darkSkyIcon)
         if (found) {
@@ -131,39 +131,39 @@ const octo = {
     },
 
     getCardinalDirection: (angle) => {
-        if (angle>11.25 && angle<33.75){
+        if (angle > 11.25 && angle < 33.75) {
             return "NNE";
-          }else if (angle>33.75 && angle<56.25){
+        } else if (angle > 33.75 && angle < 56.25) {
             return "ENE";
-          }else if (angle>56.25 && angle<78.75){
+        } else if (angle > 56.25 && angle < 78.75) {
             return "E";
-          }else if (angle>78.75 && angle<101.25){
+        } else if (angle > 78.75 && angle < 101.25) {
             return "ESE";
-          }else if (angle>101.25 && angle<123.75){
+        } else if (angle > 101.25 && angle < 123.75) {
             return "ESE";
-          }else if (angle>123.75 && angle<146.25){
+        } else if (angle > 123.75 && angle < 146.25) {
             return "SE";
-          }else if (angle>146.25 && angle<168.75){
+        } else if (angle > 146.25 && angle < 168.75) {
             return "SSE";
-          }else if (angle>168.75 && angle<191.25){
+        } else if (angle > 168.75 && angle < 191.25) {
             return "S";
-          }else if (angle>191.25 && angle<213.75){
+        } else if (angle > 191.25 && angle < 213.75) {
             return "SSW";
-          }else if (angle>213.75 && angle<236.25){
+        } else if (angle > 213.75 && angle < 236.25) {
             return "SW";
-          }else if (angle>236.25 && angle<258.75){
+        } else if (angle > 236.25 && angle < 258.75) {
             return "WSW";
-          }else if (angle>258.75 && angle<281.25){
+        } else if (angle > 258.75 && angle < 281.25) {
             return "W";
-          }else if (angle>281.25 && angle<303.75){
+        } else if (angle > 281.25 && angle < 303.75) {
             return "WNW";
-          }else if (angle>303.75 && angle<326.25){
+        } else if (angle > 303.75 && angle < 326.25) {
             return "NW";
-          }else if (angle>326.25 && angle<348.75){
+        } else if (angle > 326.25 && angle < 348.75) {
             return "NNW";
-          }else{
-            return "N"; 
-          }
+        } else {
+            return "N";
+        }
     }
 }
 
@@ -173,150 +173,150 @@ const octo = {
  * 
 */
 const view = {
-        init: () => {
-            // Wait until the DOM is fully loaded before initializing the view
-            document.addEventListener('DOMContentLoaded', () => {
+    init: () => {
+        // Wait until the DOM is fully loaded before initializing the view
+        document.addEventListener('DOMContentLoaded', () => {
+            view.updateContainerHeight()
+            window.onresize = () => {
                 view.updateContainerHeight()
-                window.onresize = () => {
-                    view.updateContainerHeight()
-                }
-
-                // To initialize a datepicker (jQuery UI plugin), make sure you
-                // add the 'datepicker' class to the text input
-                $('.datepicker').datepicker()
-
-                // Add event listeners
-                view.handleNote()
-                view.showNewTravel()
-                view.addNewTravel()
-                view.closeNewCard()
-                view.deleteCard()
-            })
-        },
-
-        /**
-         * Dynamycally update the card containers height when the content 
-         * exceeds the card height
-         * 
-        */
-        updateContainerHeight: () => {
-            const containers = document.querySelectorAll('.card-container')
-            for (let i = 0; i < containers.length; i++) {
-                const parent = containers[i].parentElement
-                const containerHeight = containers[i].offsetHeight
-                parent.style.height = containerHeight
             }
-        },
 
-        handleNote: () => {
-            // Don't use arrow function otherwise this won't be accessible
-            $('#mainContainer').on('click', '.note-btn', function (e) {
-                e.stopPropagation()
-                e.preventDefault()
-                const textArea = $('<textarea>')
-                textArea.addClass('note-text')
-                $(this).parent().append(textArea)
-                    .append('<span class="fas fa-trash-alt delete-note btn btn-danger"></span>')
-                view.updateContainerHeight()
-            })
+            // To initialize a datepicker (jQuery UI plugin), make sure you
+            // add the 'datepicker' class to the text input
+            $('.datepicker').datepicker()
 
-            // Event listener to delete the notes
-            $('#mainContainer').on('click', '.delete-note', function (e) {
-                e.stopPropagation()
-                e.preventDefault()
-                $(this).prev('.note-text').remove()
-                $(this).remove()
-                view.updateContainerHeight()
-            })
-        },
+            // Add event listeners
+            view.handleNote()
+            view.showNewTravel()
+            view.addNewTravel()
+            view.closeNewCard()
+            view.deleteCard()
+        })
+    },
 
-        showNewTravel: () => {
-            view.flipCard('.new-card-inner', '.new-card-btn', 180, () => {
-                $('.new-card-btn').css('opacity', '1')
-            })
-        },
+    /**
+     * Dynamycally update the card containers height when the content 
+     * exceeds the card height
+     * 
+    */
+    updateContainerHeight: () => {
+        const containers = document.querySelectorAll('.card-container')
+        for (let i = 0; i < containers.length; i++) {
+            const parent = containers[i].parentElement
+            const containerHeight = containers[i].offsetHeight
+            parent.style.height = containerHeight
+        }
+    },
 
-        /**
-         * @param {string} cardSelector inner card selector
-         * @param {string} btnSelector button that triggers the event (optional)
-         *                             pass undefined or null if you just want to 
-         *                             close the card
-         * @param {int} angle angle in degrees that defines how much the card 
-         *                    should be rotated
-         * @param {function} callback callback function
-         */
-        flipCard: (cardSelector, btnSelector, angle, callback) => {
-            if (!btnSelector) {
-                $(cardSelector).css('transform', `rotateY(${angle}deg)`)
+    handleNote: () => {
+        // Don't use arrow function otherwise this won't be accessible
+        $('#mainContainer').on('click', '.note-btn', function (e) {
+            e.stopPropagation()
+            e.preventDefault()
+            const textArea = $('<textarea>')
+            textArea.addClass('note-text')
+            $(this).parent().append(textArea)
+                .append('<span class="fas fa-trash-alt delete-note btn btn-danger"></span>')
+            view.updateContainerHeight()
+        })
+
+        // Event listener to delete the notes
+        $('#mainContainer').on('click', '.delete-note', function (e) {
+            e.stopPropagation()
+            e.preventDefault()
+            $(this).prev('.note-text').remove()
+            $(this).remove()
+            view.updateContainerHeight()
+        })
+    },
+
+    showNewTravel: () => {
+        view.flipCard('.new-card-inner', '.new-card-btn', 180, () => {
+            $('.new-card-btn').css('opacity', '1')
+        })
+    },
+
+    /**
+     * @param {string} cardSelector inner card selector
+     * @param {string} btnSelector button that triggers the event (optional)
+     *                             pass undefined or null if you just want to 
+     *                             close the card
+     * @param {int} angle angle in degrees that defines how much the card 
+     *                    should be rotated
+     * @param {function} callback callback function
+     */
+    flipCard: (cardSelector, btnSelector, angle, callback) => {
+        if (!btnSelector) {
+            $(cardSelector).css('transform', `rotateY(${angle}deg)`)
+        }
+        $(btnSelector).on('click', function (e) {
+            e.preventDefault()
+            $(cardSelector).css('transform', `rotateY(${angle}deg)`)
+            if (callback) {
+                callback()
             }
-            $(btnSelector).on('click', function (e) {
-                e.preventDefault()
-                $(cardSelector).css('transform', `rotateY(${angle}deg)`)
-                if (callback) {
-                    callback()
-                }
+        })
+    },
+
+    closeNewCard: () => {
+        view.flipCard('.new-card-inner', '#closeNewCard', 0, () => {
+            $('.new-card-btn').css('opacity', '1')
+        })
+    },
+
+    /**
+     * @param {int} duration
+     * @param {string} retDateSelector jquery selector of the return 
+     *                                 date input element
+     * @returns {boolean}
+     */
+    datesValidation: (duration, retDateSelector) => {
+        if (duration < 0) {
+            $.alert({
+                title: 'Invalid Date',
+                theme: 'material',
+                content: 'The return date is earlier than the departure date.',
+                useBootstrap: false,
+                boxWidth: '50%',
             })
-        },
+            $(retDateSelector).val("")
+            return false
+        }
+        return true
+    },
 
-        closeNewCard: () => {
-            view.flipCard('.new-card-inner', '#closeNewCard', 0, () => {
-                $('.new-card-btn').css('opacity', '1')
-            })
-        },
+    /**
+     * @param {string} travelid uuid v4
+     * @param {array} imgData response data from pixabay api
+     * 
+     * @returns {boolean}
+    */
 
-        /**
-         * @param {int} duration
-         * @param {string} retDateSelector jquery selector of the return 
-         *                                 date input element
-         * @returns {boolean}
-         */
-        datesValidation: (duration, retDateSelector) => {
-            if (duration < 0) {
-                $.alert({
-                    title: 'Invalid Date',
-                    theme: 'material',
-                    content: 'The return date is earlier than the departure date.',
-                    useBootstrap: false,
-                    boxWidth: '50%',
-                })
-                $(retDateSelector).val("")
-                return false
-            }
-            return true
-        },
+    updateBackgroundImage: (travelid, imgData) => {
+        if (!travelid || !imgData || imgData.totalHits === 0) return false
+        const $imgDiv = $(`[data-travelid=${travelid}]`).find('.card-backdrop')
+        // no img div found
+        if ($imgDiv.length === 0) return false
 
-        /**
-         * @param {string} travelid uuid v4
-         * @param {array} imgData response data from pixabay api
-         * 
-         * @returns {boolean}
-        */
+        const hits = imgData.hits
+        $imgDiv.css('background-image', `url("${hits[0].webformatURL}")`)
+        return true
+    },
 
-        updateBackgroundImage: (travelid, imgData) => {
-            if (!travelid || !imgData || imgData.totalHits === 0) return false
-            const $imgDiv = $(`[data-travelid=${travelid}]`).find('.card-backdrop')
-            // no img div found
-            if ($imgDiv.length === 0) return false
+    displayWeather: (travelId, weatherData) => {
+        const $div = $(`[data-travelid=${travelId}]`).find('.weather')
+        if (!travelId || !weatherData) {
+            $div.next().text('Unable to update weather information.')
+            return
+        }
+        const $header = $div.find('.card-important').find('span')
 
-            const hits = imgData.hits
-            $imgDiv.css('background-image', `url("${hits[0].webformatURL}")`)
-            return true
-        },
+        // Departure date within 3 days from today
+        weatherData.daily.data.length > 1 ? $header.text('Forecasted') : $header.text('Tipical')
 
-        displayWeather: (travelId, weatherData) => {
-            const $div = $(`[data-travelid=${travelId}]`).find('.weather')
-            if (!travelId || !weatherData) {
-                $div.next().text('Unable to update weather information.')
-                return
-            }
-            const $header = $div.find('.card-important').find('span')
-
-            // Departure date within 3 days from today
-            weatherData.daily.data.length > 1 ? $header.text('Forecasted') : $header.text('Tipical')
-
-            const $container = $('<div>').addClass('card-info-group')
-            $.each(weatherData.daily.data, (index, elem) => {
-                $container.append(`
+        const $container = $('<div>').addClass('card-info-group')
+        $.each(weatherData.daily.data, (index, elem) => {
+            $container.append(`
                 <div class="weather-group">
                     <div class="weather-date">
                         ${moment.unix(elem.time).format('MMM DD')}
@@ -334,33 +334,33 @@ const view = {
                         ${octo.getCardinalDirection(elem.windBearing)}|${(elem.windSpeed * 3.6).toFixed()}
                         <span class="unit">km/h</span></div>
                 </div>`)
+        })
+        $div.append($container)
+        view.updateContainerHeight()
+    },
+
+    addNewTravel: () => {
+        $('#newTravel').on('submit', function (event) {
+            event.preventDefault();
+
+            const userInputs = $(this).serializeArray()
+            const id = octo.addTravelPlan(userInputs)
+            const inputs = octo.arrayToKeyedObj(userInputs, 'name')
+            const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
+            const timeToNow = moment().to(depMoment)
+            const destination = inputs.travelDestination.value
+            let arrDate = "N/A"
+            const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
+            if (!view.datesValidation(duration, "[name='retDate']")) return
+            if (inputs.arrDate.value !== "") {
+                const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
+                arrDate = arrMoment.format('DDMMM').toUpperCase()
+            }
+            view.flipCard('.new-card-inner', undefined, 0, () => {
+                $('.new-card-btn').css('opacity', '1')
             })
-            $div.append($container)
-            view.updateContainerHeight()
-        },
-
-        addNewTravel: () => {
-            $('#newTravel').on('submit', function (event) {
-                event.preventDefault();
-
-                const userInputs = $(this).serializeArray()
-                const id = octo.addTravelPlan(userInputs)
-                const inputs = octo.arrayToKeyedObj(userInputs, 'name')
-                const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
-                const timeToNow = moment().to(depMoment)
-                const destination = inputs.travelDestination.value
-                let arrDate = "N/A"
-                const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
-                if (!view.datesValidation(duration, "[name='retDate']")) return
-                if (inputs.arrDate.value !== "") {
-                    const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
-                    arrDate = arrMoment.format('DDMMM').toUpperCase()
-                }
-                view.flipCard('.new-card-inner', undefined, 0, () => {
-                    $('.new-card-btn').css('opacity', '1')
-                })
-                $('#mainContainer').prepend(
-                    `<div class="card" data-travelid="${id}">
+            $('#mainContainer').prepend(
+                `<div class="card" data-travelid="${id}">
                 <span class="delete-button fas fa-trash-alt"></span>
                 <div class="card-backdrop"></div>
                 <div class="card-container">
@@ -402,53 +402,54 @@ const view = {
                     </div>
                 </div>
             </div>`
-                )
-                view.updateContainerHeight()
-                Client.apiHandler.getWeather(destination, depMoment)
-                    .then((data) => {
-                        console.log(data)
-                        view.displayWeather(id, data)
-                    })
-
-                Client.apiHandler.getImages(destination)
-                    .then((data) => {
-                        view.updateBackgroundImage(id, data)
-                    })
-            })
-        },
-
-        deleteCard: () => {
-            $('#mainContainer').on('click', '.delete-button', function (event) {
-                event.preventDefault()
-                const deleteBtn = $(this)
-                const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
-                $.confirm({
-                    theme: 'material',
-                    title: 'Delete trip',
-                    content: `Are you sure you want to delete your trip to ${destination}?`,
-                    confirmButtonClass: 'btn-danger',
-                    useBootstrap: false,
-                    boxWidth: '50%',
-                    buttons: {
-                        delete: {
-                            text: 'Delete',
-                            btnClass: 'btn-danger',
-                            keys: ["enter"],
-                            action: () => {
-                                $('.new-card').css('height', '400px')
-                                $(deleteBtn).parent().remove()
-                            }
-
-                        },
-                        cancel: () => {
-                            return
-                        }
-                    }
+            )
+            view.updateContainerHeight()
+            window.scrollTo({top: 100, left: 100, behavior: 'smooth'})
+            Client.apiHandler.getWeather(destination, depMoment)
+                .then((data) => {
+                    console.log(data)
+                    view.displayWeather(id, data)
                 })
-            })
-        }
 
+            Client.apiHandler.getImages(destination)
+                .then((data) => {
+                    view.updateBackgroundImage(id, data)
+                })
+        })
+    },
+
+    deleteCard: () => {
+        $('#mainContainer').on('click', '.delete-button', function (event) {
+            event.preventDefault()
+            const deleteBtn = $(this)
+            const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
+            $.confirm({
+                theme: 'material',
+                title: 'Delete trip',
+                content: `Are you sure you want to delete your trip to ${destination}?`,
+                confirmButtonClass: 'btn-danger',
+                useBootstrap: false,
+                boxWidth: '50%',
+                buttons: {
+                    delete: {
+                        text: 'Delete',
+                        btnClass: 'btn-danger',
+                        keys: ["enter"],
+                        action: () => {
+                            $('.new-card').css('height', '400px')
+                            $(deleteBtn).parent().remove()
+                        }
+
+                    },
+                    cancel: () => {
+                        return
+                    }
+                }
+            })
+        })
     }
+
+}
 
 // Export the application. In order to initiate the app, call 
 // octo.init() in your webpack js entry file (index.js)
