@@ -1,7 +1,7 @@
 @import 'theme';
 @import 'utilities';
 
-$max-card-height: 600px;
+$max-card-height: 700px;
 
 
 body {
@@ -275,11 +275,13 @@ body {
 .unit {
     font-size: 0.5em;
     margin-top: 4px;
+    margin-right: 0.4em;
 }
 
 .weather-group {
-    margin: 0 0.25em;
+    margin: 0 auto;
     text-align: center;
+    white-space: nowrap;
 }
 
 .min {
@@ -292,10 +294,6 @@ body {
 
 /* Apply to small devices */
 @media (max-width: 768px) {
-    body {
-        padding: 0.5em;
-    }
-
     .card,
     .new-card {
         width: 100%;
