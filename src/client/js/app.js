@@ -8,6 +8,27 @@
 * The model holds all the front end data
 */
 const model = {
+    darkSkyClimaconMap: [
+        {
+            'darkcon': 'clear-day',
+            'climacon': 'sun'
+        }, {
+            'darkcon': 'clear-night',
+            'climacon': 'moon'
+        }, {
+            'darkcon': 'cloudy',
+            'climacon': 'cloud'
+        }, {
+            'darkcon': 'partly-cloudy-day',
+            'climacon': 'cloud sun'
+        }, {
+            'darkcon': 'partly-cloudy-night',
+            'climacon': 'cloud moon'
+        }, {
+            'darkcon': 'thunderstorm',
+            'climacon': 'lightning'
+        }
+    ],
     travels: [],
     /**
      * TODO: Save travels in local storage
@@ -93,6 +114,21 @@ const octo = {
         })
         return obj
     },
+
+    /**
+     * @param {String} darkSkyIcon icon specification returned by darksky api
+     * 
+     * @returns {String} returns the matching climacon icon
+     */
+    getClimacons: (darkSkyIcon) => {
+        if(!darkSkyIcon || darkSkyIcon.trim().length < 1) return ''
+        const odds = model.darkSkyClimaconMap
+        const found = odds.find(elem => elem.darkcon === darkSkyIcon)
+        if (found) {
+            return found.climacon
+        }
+        return darkSkyIcon
+    }
 }
 
 /**
@@ -101,186 +137,194 @@ const octo = {
  * 
 */
 const view = {
-    init: () => {
-        // Wait until the DOM is fully loaded before initializing the view
-        document.addEventListener('DOMContentLoaded', () => {
-            view.updateContainerHeight()
-            window.onresize = () => {
+        init: () => {
+            // Wait until the DOM is fully loaded before initializing the view
+            document.addEventListener('DOMContentLoaded', () => {
                 view.updateContainerHeight()
-            }
+                window.onresize = () => {
+                    view.updateContainerHeight()
+                }
 
-            // To initialize a datepicker (jQuery UI plugin), make sure you
-            // add the 'datepicker' class to the text input
-            $('.datepicker').datepicker()
+                // To initialize a datepicker (jQuery UI plugin), make sure you
+                // add the 'datepicker' class to the text input
+                $('.datepicker').datepicker()
 
-            // Add event listeners
-            view.handleNote()
-            view.showNewTravel()
-            view.addNewTravel()
-            view.closeNewCard()
-            view.deleteCard()
-        })
-    },
-
-    /**
-     * Dynamycally update the card containers height when the content 
-     * exceeds the card height
-     * 
-    */
-    updateContainerHeight: () => {
-        const containers = document.querySelectorAll('.card-container')
-        for (let i = 0; i < containers.length; i++) {
-            const parent = containers[i].parentElement
-            const containerHeight = containers[i].offsetHeight
-            parent.style.height = containerHeight
-        }
-    },
-
-    handleNote: () => {
-        // Don't use arrow function otherwise this won't be accessible
-        $('#mainContainer').on('click', '.note-btn', function (e) {
-            e.stopPropagation()
-            e.preventDefault()
-            const textArea = $('<textarea>')
-            textArea.addClass('note-text')
-            $(this).parent().append(textArea)
-                .append('<span class="fas fa-trash-alt delete-note btn btn-danger"></span>')
-            view.updateContainerHeight()
-        })
-
-        // Event listener to delete the notes
-        $('#mainContainer').on('click', '.delete-note', function (e) {
-            e.stopPropagation()
-            e.preventDefault()
-            $(this).prev('.note-text').remove()
-            $(this).remove()
-            view.updateContainerHeight()
-        })
-    },
-
-    showNewTravel: () => {
-        view.flipCard('.new-card-inner', '.new-card-btn', 180, () => {
-            $('.new-card-btn').css('opacity', '1')
-        })
-    },
-
-    /**
-     * @param {string} cardSelector inner card selector
-     * @param {string} btnSelector button that triggers the event (optional)
-     *                             pass undefined or null if you just want to 
-     *                             close the card
-     * @param {int} angle angle in degrees that defines how much the card 
-     *                    should be rotated
-     * @param {function} callback callback function
-     */
-    flipCard: (cardSelector, btnSelector, angle, callback) => {
-        if (!btnSelector) {
-            $(cardSelector).css('transform', `rotateY(${angle}deg)`)
-        }
-        $(btnSelector).on('click', function (e) {
-            e.preventDefault()
-            $(cardSelector).css('transform', `rotateY(${angle}deg)`)
-            if (callback) {
-                callback()
-            }
-        })
-    },
-
-    closeNewCard: () => {
-        view.flipCard('.new-card-inner', '#closeNewCard', 0, () => {
-            $('.new-card-btn').css('opacity', '1')
-        })
-    },
-
-    /**
-     * @param {int} duration
-     * @param {string} retDateSelector jquery selector of the return 
-     *                                 date input element
-     * @returns {boolean}
-     */
-    datesValidation: (duration, retDateSelector) => {
-        if (duration < 0) {
-            $.alert({
-                title: 'Invalid Date',
-                theme: 'material',
-                content: 'The return date is earlier than the departure date.',
-                useBootstrap: false,
-                boxWidth: '50%',
+                // Add event listeners
+                view.handleNote()
+                view.showNewTravel()
+                view.addNewTravel()
+                view.closeNewCard()
+                view.deleteCard()
             })
-            $(retDateSelector).val("")
-            return false
-        }
-        return true
-    },
+        },
 
-    /**
-     * @param {string} travelid uuid v4
-     * @param {array} imgData response data from pixabay api
-     * 
-     * @returns {boolean}
-    */
-
-    updateBackgroundImage: (travelid, imgData) => {
-        if (!travelid || !imgData || imgData.totalHits === 0) return false
-        const $imgDiv = $(`[data-travelid=${travelid}]`).find('.card-backdrop')
-        // no img div found
-        if ($imgDiv.length === 0) return false
-
-        const hits = imgData.hits
-        $imgDiv.css('background-image', `url("${hits[0].webformatURL}")`)
-        return true
-    },
-
-    displayWeather: (travelId, weatherData) => {
-        const $div = $(`[data-travelid=${travelId}]`).find('.weather')
-        if (!travelId || !weatherData) {
-            $div.next().text('Unable to update weather information.')
-            return
-        }
-        const $header = $div.find('.card-important').find('span')
-
-        // Departure date within 3 days from today
-        weatherData.daily.data.length > 1 ? $header.text('Forecasted') : $header.text('Tipical')
-
-        const $container = $('<div>').addClass('card-info-group')
-        $.each(weatherData.daily.data, (index, elem) => {
-            $container.append(`
-                <div class="card-group">
-                    <div>${moment.unix(elem.time).format('MMM DD')}</div>    
-                    <div><span class="${elem.icon}"></span></div>
-                    <div>
-                        <span>${Math.floor(elem.temperatureLow)}°C</span>
-                        <span>/${Math.floor(elem.temperatureHigh)}°C</span>
-                    </div>  
-                    <div>${(elem.windSpeed * 3.6).toFixed(1)}km/h - ${elem.windBearing}°</div>
-                </div>`)
-        })
-        $div.append($container)
-        view.updateContainerHeight()
-    },
-
-    addNewTravel: () => {
-        $('#newTravel').on('submit', function (event) {
-            event.preventDefault();
-
-            const userInputs = $(this).serializeArray()
-            const id = octo.addTravelPlan(userInputs)
-            const inputs = octo.arrayToKeyedObj(userInputs, 'name')
-            const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
-            const timeToNow = moment().to(depMoment)
-            const destination = inputs.travelDestination.value
-            let arrDate = "N/A"
-            const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
-            if (!view.datesValidation(duration, "[name='retDate']")) return
-            if (inputs.arrDate.value !== "") {
-                const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
-                arrDate = arrMoment.format('DDMMM').toUpperCase()
+        /**
+         * Dynamycally update the card containers height when the content 
+         * exceeds the card height
+         * 
+        */
+        updateContainerHeight: () => {
+            const containers = document.querySelectorAll('.card-container')
+            for (let i = 0; i < containers.length; i++) {
+                const parent = containers[i].parentElement
+                const containerHeight = containers[i].offsetHeight
+                parent.style.height = containerHeight
             }
-            view.flipCard('.new-card-inner', undefined, 0, () => {
+        },
+
+        handleNote: () => {
+            // Don't use arrow function otherwise this won't be accessible
+            $('#mainContainer').on('click', '.note-btn', function (e) {
+                e.stopPropagation()
+                e.preventDefault()
+                const textArea = $('<textarea>')
+                textArea.addClass('note-text')
+                $(this).parent().append(textArea)
+                    .append('<span class="fas fa-trash-alt delete-note btn btn-danger"></span>')
+                view.updateContainerHeight()
+            })
+
+            // Event listener to delete the notes
+            $('#mainContainer').on('click', '.delete-note', function (e) {
+                e.stopPropagation()
+                e.preventDefault()
+                $(this).prev('.note-text').remove()
+                $(this).remove()
+                view.updateContainerHeight()
+            })
+        },
+
+        showNewTravel: () => {
+            view.flipCard('.new-card-inner', '.new-card-btn', 180, () => {
                 $('.new-card-btn').css('opacity', '1')
             })
-            $('#mainContainer').prepend(
-                `<div class="card" data-travelid="${id}">
+        },
+
+        /**
+         * @param {string} cardSelector inner card selector
+         * @param {string} btnSelector button that triggers the event (optional)
+         *                             pass undefined or null if you just want to 
+         *                             close the card
+         * @param {int} angle angle in degrees that defines how much the card 
+         *                    should be rotated
+         * @param {function} callback callback function
+         */
+        flipCard: (cardSelector, btnSelector, angle, callback) => {
+            if (!btnSelector) {
+                $(cardSelector).css('transform', `rotateY(${angle}deg)`)
+            }
+            $(btnSelector).on('click', function (e) {
+                e.preventDefault()
+                $(cardSelector).css('transform', `rotateY(${angle}deg)`)
+                if (callback) {
+                    callback()
+                }
+            })
+        },
+
+        closeNewCard: () => {
+            view.flipCard('.new-card-inner', '#closeNewCard', 0, () => {
+                $('.new-card-btn').css('opacity', '1')
+            })
+        },
+
+        /**
+         * @param {int} duration
+         * @param {string} retDateSelector jquery selector of the return 
+         *                                 date input element
+         * @returns {boolean}
+         */
+        datesValidation: (duration, retDateSelector) => {
+            if (duration < 0) {
+                $.alert({
+                    title: 'Invalid Date',
+                    theme: 'material',
+                    content: 'The return date is earlier than the departure date.',
+                    useBootstrap: false,
+                    boxWidth: '50%',
+                })
+                $(retDateSelector).val("")
+                return false
+            }
+            return true
+        },
+
+        /**
+         * @param {string} travelid uuid v4
+         * @param {array} imgData response data from pixabay api
+         * 
+         * @returns {boolean}
+        */
+
+        updateBackgroundImage: (travelid, imgData) => {
+            if (!travelid || !imgData || imgData.totalHits === 0) return false
+            const $imgDiv = $(`[data-travelid=${travelid}]`).find('.card-backdrop')
+            // no img div found
+            if ($imgDiv.length === 0) return false
+
+            const hits = imgData.hits
+            $imgDiv.css('background-image', `url("${hits[0].webformatURL}")`)
+            return true
+        },
+
+        displayWeather: (travelId, weatherData) => {
+            const $div = $(`[data-travelid=${travelId}]`).find('.weather')
+            if (!travelId || !weatherData) {
+                $div.next().text('Unable to update weather information.')
+                return
+            }
+            const $header = $div.find('.card-important').find('span')
+
+            // Departure date within 3 days from today
+            weatherData.daily.data.length > 1 ? $header.text('Forecasted') : $header.text('Tipical')
+
+            const $container = $('<div>').addClass('card-info-group')
+            $.each(weatherData.daily.data, (index, elem) => {
+                $container.append(`
+                <div class="weather-group">
+                    <div class="weather-date">
+                        ${moment.unix(elem.time).format('MMM DD')}
+                    </div>    
+                    <div class='icon'>
+                        <span class="fs1 climacon ${octo.getClimacons(elem.icon)}"></span>
+                    </div>
+                    <div class="d-flex justify-center">
+                     <span class="min">${Math.floor(elem.temperatureLow)}
+                    </span><span class="unit">°C</span>
+                    <span class="max">${Math.floor(elem.temperatureHigh)}
+                    </span><span class="unit">°C</span>
+                    </div>  
+                    <div class='d-flex justify-center'>
+                        ${(elem.windSpeed * 3.6).toFixed()}
+                        <span class="unit">km/h</span> ${elem.windBearing}°</div>
+                </div>`)
+            })
+            $div.append($container)
+            view.updateContainerHeight()
+        },
+
+        addNewTravel: () => {
+            $('#newTravel').on('submit', function (event) {
+                event.preventDefault();
+
+                const userInputs = $(this).serializeArray()
+                const id = octo.addTravelPlan(userInputs)
+                const inputs = octo.arrayToKeyedObj(userInputs, 'name')
+                const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
+                const timeToNow = moment().to(depMoment)
+                const destination = inputs.travelDestination.value
+                let arrDate = "N/A"
+                const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
+                if (!view.datesValidation(duration, "[name='retDate']")) return
+                if (inputs.arrDate.value !== "") {
+                    const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
+                    arrDate = arrMoment.format('DDMMM').toUpperCase()
+                }
+                view.flipCard('.new-card-inner', undefined, 0, () => {
+                    $('.new-card-btn').css('opacity', '1')
+                })
+                $('#mainContainer').prepend(
+                    `<div class="card" data-travelid="${id}">
                 <span class="delete-button fas fa-trash-alt"></span>
                 <div class="card-backdrop"></div>
                 <div class="card-container">
@@ -322,53 +366,53 @@ const view = {
                     </div>
                 </div>
             </div>`
-            )
-            view.updateContainerHeight()
-            Client.apiHandler.getWeather(destination, depMoment)
-                .then((data) => {
-                    console.log(data)
-                    view.displayWeather(id, data)
-                })
+                )
+                view.updateContainerHeight()
+                Client.apiHandler.getWeather(destination, depMoment)
+                    .then((data) => {
+                        console.log(data)
+                        view.displayWeather(id, data)
+                    })
 
-            Client.apiHandler.getImages(destination)
-                .then((data) => {
-                    view.updateBackgroundImage(id, data)
-                })
-        })
-    },
-
-    deleteCard: () => {
-        $('#mainContainer').on('click', '.delete-button', function (event) {
-            event.preventDefault()
-            const deleteBtn = $(this)
-            const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
-            $.confirm({
-                theme: 'material',
-                title: 'Delete trip',
-                content: `Are you sure you want to delete your trip to ${destination}?`,
-                confirmButtonClass: 'btn-danger',
-                useBootstrap: false,
-                boxWidth: '50%',
-                buttons: {
-                    delete: {
-                        text: 'Delete',
-                        btnClass: 'btn-danger',
-                        keys: ["enter"],
-                        action: () => {
-                            $('.new-card').css('height', '400px')
-                            $(deleteBtn).parent().remove()
-                        }
-
-                    },
-                    cancel: () => {
-                        return
-                    }
-                }
+                Client.apiHandler.getImages(destination)
+                    .then((data) => {
+                        view.updateBackgroundImage(id, data)
+                    })
             })
-        })
-    }
+        },
 
-}
+        deleteCard: () => {
+            $('#mainContainer').on('click', '.delete-button', function (event) {
+                event.preventDefault()
+                const deleteBtn = $(this)
+                const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
+                $.confirm({
+                    theme: 'material',
+                    title: 'Delete trip',
+                    content: `Are you sure you want to delete your trip to ${destination}?`,
+                    confirmButtonClass: 'btn-danger',
+                    useBootstrap: false,
+                    boxWidth: '50%',
+                    buttons: {
+                        delete: {
+                            text: 'Delete',
+                            btnClass: 'btn-danger',
+                            keys: ["enter"],
+                            action: () => {
+                                $('.new-card').css('height', '400px')
+                                $(deleteBtn).parent().remove()
+                            }
+
+                        },
+                        cancel: () => {
+                            return
+                        }
+                    }
+                })
+            })
+        }
+
+    }
 
 // Export the application. In order to initiate the app, call 
 // octo.init() in your webpack js entry file (index.js)
