@@ -38,7 +38,7 @@ const model = {
  * DOM elements, backend API and client data.
 */
 const octo = {
-    init: () => {
+    init: function () {
         view.init()
     },
     /**
@@ -87,7 +87,7 @@ const octo = {
     deleteTravelPlan: (id) => {
         if (!id) return false
         const index = model.travels.findIndex((elem) => elem.id === id)
-        if(index === -1) return false
+        if (index === -1) return false
 
         // delete travel from local model
         if (model.travels[index]) {
@@ -211,18 +211,36 @@ const octo = {
      */
     saveToLocalStorage: (name, value) => {
         try {
-          // Clear all values previously saved
-          localStorage.clear();
-    
-          if (octo.storageAvailable()) {
-            localStorage.setItem(name, JSON.stringify(value))
-            return true;
-          }
+            // Clear all values previously saved
+            localStorage.clear();
+
+            if (octo.storageAvailable()) {
+                localStorage.setItem(name, JSON.stringify(value))
+                return true;
+            }
         } catch (e) {
-          console.log(e);
-          return false;
+            console.log(e);
+            return false;
         }
-      },
+    },
+
+    /**
+     * @param {string} name Name of data element to search in localStorage for
+     * @param {string} [modelKey = name] Key to assign the data into the model object
+     *                                   By default is the same as the name 
+     * @returns {object} 
+    */
+    readFromLocalStorage: (name, modelKey = name) => {
+        if(!name || name.trim() === '') return false
+        const data = localStorage.getItem(name)
+        if(data) {
+            const parsedData = JSON.parse(data);
+            // update the local model
+            model[modelKey] = parsedData
+            return parsedData
+        }
+    }
+
 }
 
 /**
@@ -397,6 +415,10 @@ const view = {
         view.updateContainerHeight()
     },
 
+    addSavedTravels: (id, travels) => {
+
+    },
+
     addNewTravel: () => {
         $('#newTravel').on('submit', function (event) {
             event.preventDefault();
@@ -462,7 +484,7 @@ const view = {
             </div>`
             )
             view.updateContainerHeight()
-            window.scrollTo({top: 100, left: 100, behavior: 'smooth'})
+            window.scrollTo({ top: 100, left: 100, behavior: 'smooth' })
             Client.apiHandler.getWeather(destination, depMoment)
                 .then((data) => {
                     view.displayWeather(id, data)
