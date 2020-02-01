@@ -128,6 +128,42 @@ const octo = {
             return found.climacon
         }
         return darkSkyIcon
+    },
+
+    getCardinalDirection: (angle) => {
+        if (angle>11.25 && angle<33.75){
+            return "NNE";
+          }else if (angle>33.75 && angle<56.25){
+            return "ENE";
+          }else if (angle>56.25 && angle<78.75){
+            return "E";
+          }else if (angle>78.75 && angle<101.25){
+            return "ESE";
+          }else if (angle>101.25 && angle<123.75){
+            return "ESE";
+          }else if (angle>123.75 && angle<146.25){
+            return "SE";
+          }else if (angle>146.25 && angle<168.75){
+            return "SSE";
+          }else if (angle>168.75 && angle<191.25){
+            return "S";
+          }else if (angle>191.25 && angle<213.75){
+            return "SSW";
+          }else if (angle>213.75 && angle<236.25){
+            return "SW";
+          }else if (angle>236.25 && angle<258.75){
+            return "WSW";
+          }else if (angle>258.75 && angle<281.25){
+            return "W";
+          }else if (angle>281.25 && angle<303.75){
+            return "WNW";
+          }else if (angle>303.75 && angle<326.25){
+            return "NW";
+          }else if (angle>326.25 && angle<348.75){
+            return "NNW";
+          }else{
+            return "N"; 
+          }
     }
 }
 
@@ -295,8 +331,8 @@ const view = {
                     </span><span class="unit">°C</span>
                     </div>  
                     <div class='d-flex justify-center'>
-                        ${(elem.windSpeed * 3.6).toFixed()}
-                        <span class="unit">km/h</span> ${elem.windBearing}°</div>
+                        ${octo.getCardinalDirection(elem.windBearing)}|${(elem.windSpeed * 3.6).toFixed()}
+                        <span class="unit">km/h</span></div>
                 </div>`)
             })
             $div.append($container)
