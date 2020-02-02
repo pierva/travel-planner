@@ -88,11 +88,10 @@ const octo = {
         if (!id) return false
         const index = model.travels.findIndex((elem) => elem.id === id)
         if (index === -1) return false
-
+        
         // delete travel from local model
-        if (model.travels[index]) {
-            delete model.travels[index]
-        }
+        model.travels.splice(index, 1)
+
         // update localStorage
         octo.saveToLocalStorage('travels', model.travels)
         return true
