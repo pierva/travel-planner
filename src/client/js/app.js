@@ -94,7 +94,7 @@ const octo = {
             delete model.travels[index]
         }
         // update localStorage
-        octo.saveToLocalStorage(model.travels)
+        octo.saveToLocalStorage('travels', model.travels)
         return true
     },
 
@@ -196,42 +196,46 @@ const octo = {
         }
         return `<div class="card" data-travelid="${options.travelId}">
             <span class="delete-button fas fa-trash-alt"></span>
-            <div class="card-backdrop"></div>
-            <div class="card-container">
-                <h2 class="card-head" data-destination="${destination}">
-                ${duration} days to ${destination}
-                </h2>
-                <div class="card-important">Departing:</div>
-                <div>${options.depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
-                <hr class="separator">
-                <div class="card-info-group">
-                    <div>
-                        <h6>Flight Details:</h6>
-                        <button class="btn-warning">Edit</button>
-                        <button class="btn-danger">Delete</button>
-                    </div>
-                    <div class="card-group">
-                        <div class="info-note">Origin</div>
-                        <div class="text-uppercase">
-                        ${inputs.flightOrigin.value} ${options.depMoment.format('DDMMM')} ${inputs.originTime.value}
+            <div class='card-inner'>
+                <div class='card-front'>
+                    <div class="card-backdrop"></div>
+                    <div class="card-container">
+                        <h2 class="card-head" data-destination="${destination}">
+                        ${duration} days to ${destination}
+                        </h2>
+                        <div class="card-important">Departing:</div>
+                        <div>${options.depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
+                        <hr class="separator">
+                        <div class="card-info-group">
+                            <div>
+                                <h6>Flight Details:</h6>
+                                <button class="btn-warning">Edit</button>
+                                <button class="btn-danger">Delete</button>
+                            </div>
+                            <div class="card-group">
+                                <div class="info-note">Origin</div>
+                                <div class="text-uppercase">
+                                ${inputs.flightOrigin.value} ${options.depMoment.format('DDMMM')} ${inputs.originTime.value}
+                                </div>
+                                <div class="info-note">Destination</div>
+                                <div class="text-uppercase">
+                                ${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}
+                                </div>
+                                <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
+                            </div>
                         </div>
-                        <div class="info-note">Destination</div>
-                        <div class="text-uppercase">
-                        ${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}
+                        <hr class="separator">
+                        <div class="card-group weather">
+                            <div class="card-important">
+                            <span>Tipical</span> weather for travel date</div>
                         </div>
-                        <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
+                        <div class="note-group">
+                            <button class="btn-primary note-btn">
+                                <span class="fas fa-plus"></span>
+                                <span>Add Note</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <hr class="separator">
-                <div class="card-group weather">
-                    <div class="card-important">
-                    <span>Tipical</span> weather for travel date</div>
-                </div>
-                <div class="note-group">
-                    <button class="btn-primary note-btn">
-                        <span class="fas fa-plus"></span>
-                        <span>Add Note</span>
-                    </button>
                 </div>
             </div>
         </div>`
@@ -346,7 +350,7 @@ const view = {
     updateContainerHeight: () => {
         const containers = document.querySelectorAll('.card-container')
         for (let i = 0; i < containers.length; i++) {
-            const parent = containers[i].parentElement
+            const parent = containers[i].closest('.card')
             const containerHeight = containers[i].offsetHeight
             parent.style.height = containerHeight
         }
@@ -546,7 +550,7 @@ const view = {
         $('#mainContainer').on('click', '.delete-button', function (event) {
             event.preventDefault()
             const deleteBtn = $(this)
-            const destination = $(this).siblings('.card-container').find('.card-head').data('destination')
+            const destination = $(this).siblings('.card-inner').find('.card-head').data('destination')
             const travelId = deleteBtn.parent().data('travelid')
             $.confirm({
                 theme: 'material',
