@@ -231,9 +231,9 @@ const octo = {
      * @returns {object} 
     */
     readFromLocalStorage: (name, modelKey = name) => {
-        if(!name || name.trim() === '') return false
+        if (!name || name.trim() === '') return false
         const data = localStorage.getItem(name)
-        if(data) {
+        if (data) {
             const parsedData = JSON.parse(data);
             // update the local model
             model[modelKey] = parsedData
@@ -256,6 +256,8 @@ const view = {
             window.onresize = () => {
                 view.updateContainerHeight()
             }
+
+            view.displaySavedTravels()
 
             // To initialize a datepicker (jQuery UI plugin), make sure you
             // add the 'datepicker' class to the text input
@@ -379,6 +381,10 @@ const view = {
         return true
     },
 
+    /**
+     * @param {string} travelId uuid v4 of the travel
+     * @param {Object} weatherData response from DarkSky API
+     */
     displayWeather: (travelId, weatherData) => {
         const $div = $(`[data-travelid=${travelId}]`).find('.weather')
         if (!travelId || !weatherData) {
@@ -415,14 +421,9 @@ const view = {
         view.updateContainerHeight()
     },
 
-    addSavedTravels: (id, travels) => {
-
-    },
-
     addNewTravel: () => {
         $('#newTravel').on('submit', function (event) {
             event.preventDefault();
-
             const userInputs = $(this).serializeArray()
             const id = octo.addTravelPlan(userInputs)
             const inputs = octo.arrayToKeyedObj(userInputs, 'name')
@@ -495,6 +496,77 @@ const view = {
                     view.updateBackgroundImage(id, data)
                 })
         })
+    },
+
+    displaySavedTravels: () => {
+        const travels = octo.readFromLocalStorage('travels')
+        if (travels) {
+            $.each(travels, (index, travel) => {
+                const inputs = octo.arrayToKeyedObj(travel.data, 'name')
+                const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
+                const timeToNow = moment().to(depMoment)
+                const destination = inputs.travelDestination.value
+                let arrDate = "N/A"
+                const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
+                if (inputs.arrDate.value !== "") {
+                    const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
+                    arrDate = arrMoment.format('DDMMM').toUpperCase()
+                }
+                $('#mainContainer').prepend(
+                    `<div class="card" data-travelid="${travel.id}">
+                    <span class="delete-button fas fa-trash-alt"></span>
+                    <div class="card-backdrop"></div>
+                    <div class="card-container">
+                        <h2 class="card-head" data-destination="${destination}">
+                        ${duration} days to ${destination}
+                        </h2>
+                        <div class="card-important">Departing:</div>
+                        <div>${depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
+                        <hr class="separator">
+                        <div class="card-info-group">
+                            <div>
+                                <h6>Flight Details:</h6>
+                                <button class="btn-warning">Edit</button>
+                                <button class="btn-danger">Delete</button>
+                            </div>
+                            <div class="card-group">
+                                <div class="info-note">Origin</div>
+                                <div class="text-uppercase">
+                                ${inputs.flightOrigin.value} ${depMoment.format('DDMMM')} ${inputs.originTime.value}
+                                </div>
+                                <div class="info-note">Destination</div>
+                                <div class="text-uppercase">
+                                ${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}
+                                </div>
+                                <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
+                            </div>
+                        </div>
+                        <hr class="separator">
+                        <div class="card-group weather">
+                            <div class="card-important">
+                            <span>Tipical</span> weather for travel date</div>
+                        </div>
+                        <div class="note-group">
+                            <button class="btn-primary note-btn">
+                                <span class="fas fa-plus"></span>
+                                <span>Add Note</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>`
+                )
+                view.updateContainerHeight()
+                Client.apiHandler.getWeather(destination, depMoment)
+                    .then((data) => {
+                        view.displayWeather(travel.id, data)
+                    })
+
+                Client.apiHandler.getImages(destination)
+                    .then((data) => {
+                        view.updateBackgroundImage(travel.id, data)
+                    })
+            })
+        }
     },
 
     deleteCard: () => {
