@@ -238,66 +238,81 @@ const octo = {
                 <div class='card-back'>
                     <span class="close">&#10005;</span>
                     <h2 class='card-head'>Update travel plan</h2>
-                    <form action="#" class='update-travel' data-travelid="${options.travelId}">
-                        <div class="input-group">
-                            <label for="travelDestination" class="required">TRAVEL DESTINATION</label>
-                            <input type="text" name="travelDestination" class="form-field" required>
-                        </div>
-                        <div>Flight / Trip details</div>
-                        <div class="input-group">
-                            <label for="flightOrigin" class="inner-label">ORIGIN (AIRPORT CODE)</label>
-                            <input type="text" name="flightOrigin" class="inner-label-input form-field">
-                        </div>
-                        <div class="input-group-inline">
-                            <div class="form-group-inline w-60">
-                                <label for="depDate" class="inner-label required">DEP DATE</label>
-                                <input type="text" name="depDate"
-                                    class="datepicker inner-label-input form-field" required>
-                            </div>
-                            <div class="form-group-inline w-40">
-                                <label for="originTime" class="inner-label required">TIME</label>
-                                <input type="time" name="originTime" pattern="[0-9]{2}:[0-9]{2}"
-                                    placeholder="HH:MM" class="inner-label-input form-field" required>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="flightDestination" class="inner-label">DESTINATION (AIRPORT
-                                CODE)</label>
-                            <input type="text" name="flightDestination"
-                                class="inner-label-input form-field">
-                        </div>
-                        <div class="input-group-inline">
-                            <div class="form-group-inline w-60">
-                                <label for="arrDate" class="inner-label">ARR DATE</label>
-                                <input type="text" name="arrDate"
-                                    class="datepicker inner-label-input form-field">
-                            </div>
-                            <div class="form-group-inline w-40">
-                                <label for="arrivalTime" class="inner-label">TIME</label>
-                                <input type="time" name="arrivalTime" pattern="[0-9]{2}:[0-9]{2}"
-                                    placeholder="HH:MM" class="inner-label-input form-field">
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="airline" class="inner-label">AIRLINE</label>
-                            <input type="text" name="airline" class="inner-label-input form-field">
-                        </div>
-                        <div class="input-group">
-                            <label for="flightNumber" class="inner-label">FLIGHT NUMBER</label>
-                            <input type="text" name="flightNumber" class="inner-label-input form-field">
-                        </div>
-
-                        <div class="input-group">
-                            <label for="retDate" class="inner-label required">RET DATE</label>
-                            <input type="text" name="retDate"
-                                class="datepicker inner-label-input form-field" required>
-                        </div>
-                        <input type="submit" class="btn btn-warning" value="Update travel">
-                    </form>
                 </div>
             </div>
         </div>`
+    },
+
+    cardBackTemplate: (travelId, options) => {
+        return `
+            <form action="#" class='update-travel' data-travelid="${travelId}">
+                <div class="input-group">
+                    <label for="travelDestination" class="required">TRAVEL DESTINATION</label>
+                    <input type="text" name="travelDestination" class="form-field" required 
+                        value="${options.travelDestination.value}">
+                </div>
+                <div>Flight / Trip details</div>
+                <div class="input-group">
+                    <label for="flightOrigin" class="inner-label">ORIGIN (AIRPORT CODE)</label>
+                    <input type="text" name="flightOrigin" class="inner-label-input form-field" 
+                        value="${options.flightOrigin.value}">
+                </div>
+                <div class="input-group-inline">
+                    <div class="form-group-inline w-60">
+                        <label for="depDate" class="inner-label required">DEP DATE</label>
+                        <input type="text" name="depDate"
+                            class="datepicker inner-label-input form-field" required
+                            value="${options.depDate.value}">
+                    </div>
+                    <div class="form-group-inline w-40">
+                        <label for="originTime" class="inner-label required">TIME</label>
+                        <input type="time" name="originTime" pattern="[0-9]{2}:[0-9]{2}"
+                            placeholder="HH:MM" class="inner-label-input form-field" required
+                            value="${options.originTime.value}">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="flightDestination" class="inner-label">DESTINATION (AIRPORT
+                        CODE)</label>
+                    <input type="text" name="flightDestination"
+                        class="inner-label-input form-field"
+                        value="${options.flightDestination.value}">
+                </div>
+                <div class="input-group-inline">
+                    <div class="form-group-inline w-60">
+                        <label for="arrDate" class="inner-label">ARR DATE</label>
+                        <input type="text" name="arrDate"
+                            class="datepicker inner-label-input form-field"
+                            value="${options.arrDate.value}">
+                    </div>
+                    <div class="form-group-inline w-40">
+                        <label for="arrivalTime" class="inner-label">TIME</label>
+                        <input type="time" name="arrivalTime" pattern="[0-9]{2}:[0-9]{2}"
+                            placeholder="HH:MM" class="inner-label-input form-field" 
+                            value="${options.arrivalTime.value}">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="airline" class="inner-label">AIRLINE</label>
+                    <input type="text" name="airline" class="inner-label-input form-field"
+                    value="${options.airline.value}">
+                </div>
+                <div class="input-group">
+                    <label for="flightNumber" class="inner-label">FLIGHT NUMBER</label>
+                    <input type="text" name="flightNumber" class="inner-label-input form-field"
+                    value="${options.flightNumber.value}">
+                </div>
+
+                <div class="input-group">
+                    <label for="retDate" class="inner-label required">RET DATE</label>
+                    <input type="text" name="retDate"
+                        class="datepicker inner-label-input form-field" required
+                        value="${options.retDate.value}">
+                </div>
+                <input type="submit" class="btn btn-warning" value="Update travel">
+            </form>
+        `
     },
 
     /** 
@@ -475,6 +490,12 @@ const view = {
     editTravel: () => {
         $('#mainContainer').on('click', '.edit-card', function (e) {
             e.preventDefault()
+            const travelId = $(this).parents('.card').data('travelid')
+            const travelPlan = octo.getTravelPlan(travelId)[0]
+            const inputs = octo.arrayToKeyedObj(travelPlan.data, 'name')
+            $(this).parents('.card-front').siblings('.card-back')
+                .append(octo.cardBackTemplate(travelId, inputs))
+        
             view.flipCard($(this).parents('.card-inner'), undefined, 180)
         })
     },
