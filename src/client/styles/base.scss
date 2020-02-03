@@ -135,6 +135,7 @@ body {
 
 .card-head {
     text-align: center;
+    margin-top: 0.5em;
     font-family: $secondary-font;
 }
 
@@ -149,6 +150,7 @@ body {
     flex-direction: row;
     justify-content: space-between;
     overflow-x: scroll;
+    padding: 0 0.25em;
 }
 
 .card-group {
@@ -223,18 +225,18 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.new-card-back {
-    @extend %card-face;
-    padding: 0.25em;
+    z-index: 1;
 }
 
 .card-back,
 .new-card-back {
+    @extend %card-face;
+    padding: 0.25em;
     background-color: #fff;
     transform: rotateY(180deg);
     border-radius: 0.5em;
+    z-index: 2;
+    text-align: center;
 }
 
 .info-note {

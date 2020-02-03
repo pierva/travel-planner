@@ -208,8 +208,7 @@ const octo = {
                         <div class="card-info-group">
                             <div>
                                 <h6>Flight Details:</h6>
-                                <button class="btn-warning">Edit</button>
-                                <button class="btn-danger">Delete</button>
+                                <button class="btn-warning edit-card">Edit</button>
                             </div>
                             <div class="card-group">
                                 <div class="info-note">Origin</div>
@@ -235,6 +234,67 @@ const octo = {
                             </button>
                         </div>
                     </div>
+                </div>
+                <div class='card-back'>
+                    <span class="close">&#10005;</span>
+                    <h2 class='card-head'>Update travel plan</h2>
+                    <form action="#" class='update-travel' data-travelid="${options.travelId}">
+                        <div class="input-group">
+                            <label for="travelDestination" class="required">TRAVEL DESTINATION</label>
+                            <input type="text" name="travelDestination" class="form-field" required>
+                        </div>
+                        <div>Flight / Trip details</div>
+                        <div class="input-group">
+                            <label for="flightOrigin" class="inner-label">ORIGIN (AIRPORT CODE)</label>
+                            <input type="text" name="flightOrigin" class="inner-label-input form-field">
+                        </div>
+                        <div class="input-group-inline">
+                            <div class="form-group-inline w-60">
+                                <label for="depDate" class="inner-label required">DEP DATE</label>
+                                <input type="text" name="depDate"
+                                    class="datepicker inner-label-input form-field" required>
+                            </div>
+                            <div class="form-group-inline w-40">
+                                <label for="originTime" class="inner-label required">TIME</label>
+                                <input type="time" name="originTime" pattern="[0-9]{2}:[0-9]{2}"
+                                    placeholder="HH:MM" class="inner-label-input form-field" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="flightDestination" class="inner-label">DESTINATION (AIRPORT
+                                CODE)</label>
+                            <input type="text" name="flightDestination"
+                                class="inner-label-input form-field">
+                        </div>
+                        <div class="input-group-inline">
+                            <div class="form-group-inline w-60">
+                                <label for="arrDate" class="inner-label">ARR DATE</label>
+                                <input type="text" name="arrDate"
+                                    class="datepicker inner-label-input form-field">
+                            </div>
+                            <div class="form-group-inline w-40">
+                                <label for="arrivalTime" class="inner-label">TIME</label>
+                                <input type="time" name="arrivalTime" pattern="[0-9]{2}:[0-9]{2}"
+                                    placeholder="HH:MM" class="inner-label-input form-field">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="airline" class="inner-label">AIRLINE</label>
+                            <input type="text" name="airline" class="inner-label-input form-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="flightNumber" class="inner-label">FLIGHT NUMBER</label>
+                            <input type="text" name="flightNumber" class="inner-label-input form-field">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="retDate" class="inner-label required">RET DATE</label>
+                            <input type="text" name="retDate"
+                                class="datepicker inner-label-input form-field" required>
+                        </div>
+                        <input type="submit" class="btn btn-warning" value="Update travel">
+                    </form>
                 </div>
             </div>
         </div>`
@@ -338,6 +398,7 @@ const view = {
             view.addNewTravel()
             view.closeNewCard()
             view.deleteCard()
+            view.editTravel()
         })
     },
 
@@ -377,12 +438,6 @@ const view = {
         })
     },
 
-    showNewTravel: () => {
-        view.flipCard('.new-card-inner', '.new-card-btn', 180, () => {
-            $('.new-card-btn').css('opacity', '1')
-        })
-    },
-
     /**
      * @param {string} cardSelector inner card selector
      * @param {string} btnSelector button that triggers the event (optional)
@@ -399,15 +454,28 @@ const view = {
         $(btnSelector).on('click', function (e) {
             e.preventDefault()
             $(cardSelector).css('transform', `rotateY(${angle}deg)`)
-            if (callback) {
-                callback()
-            }
         })
+        if (callback) {
+            callback()
+        }
+    },
+
+    showNewTravel: () => {
+        view.flipCard('.new-card-inner', '.new-card-btn', 180)
     },
 
     closeNewCard: () => {
-        view.flipCard('.new-card-inner', '#closeNewCard', 0, () => {
-            $('.new-card-btn').css('opacity', '1')
+        $('#mainContainer').on('click', '.close', function(e) {
+            e.preventDefault()          
+            $(this).parents('.card-inner, .new-card-inner')
+                .css('transform', 'rotateY(0deg)')
+        })
+    },
+
+    editTravel: () => {
+        $('#mainContainer').on('click', '.edit-card', function (e) {
+            e.preventDefault()
+            view.flipCard($(this).parents('.card-inner'), undefined, 180)
         })
     },
 
