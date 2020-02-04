@@ -523,6 +523,9 @@ const view = {
             const cardBack = $(this).parents('.card-front').siblings('.card-back')
             cardBack.find('form').remove()
             cardBack.append(octo.cardBackTemplate(travelId, inputs))   
+
+            //Re-inizialize the datapicker
+            $('.datepicker').datepicker()
             view.flipCard($(this).parents('.card-inner'), undefined, 180)
             
         })
