@@ -342,6 +342,12 @@ const octo = {
         `
     },
 
+    addNote: (travelId, noteId, noteText) => {
+        console.log(travelId)
+        console.log(noteId);
+        console.log(noteText); 
+    },
+
     /** 
      * function taken from MDN docs. It checks if local or session storage is
      * available
@@ -466,9 +472,10 @@ const view = {
             const travelId = $(this).parents('.card').data('travelid')
             const textArea = $('<textarea>')
             textArea.addClass('note-text')
+            const noteId = octo.uuidv4()
             const noteForm = `
-                <form action="#" class="note-form" data-travelid=${travelId}>
-                    <textarea class='note-text' spellcheck="true"></textarea>
+                <form action="#" data-noteid="${noteId}" class="note-form" data-travelid="${travelId}">
+                    <textarea name="noteText" class='note-text' spellcheck="true"></textarea>
                     <div>
                         <button class="btn btn-danger delete-note">
                             <span class="fas fa-trash-alt"></span>
@@ -481,14 +488,14 @@ const view = {
             `
             $(this).parent().append(noteForm)
             view.updateContainerHeight()
+            view.addNote(`[data-noteid="${noteId}"]`, travelId)
         })
 
         // Event listener to delete the notes
         $('#mainContainer').on('click', '.delete-note', function (e) {
             e.stopPropagation()
             e.preventDefault()
-            $(this).prev('.note-text').remove()
-            $(this).remove()
+            $(this).parents('form').remove()
             view.updateContainerHeight()
         })
     },
@@ -695,7 +702,17 @@ const view = {
                 })
         })
     },
-    
+
+    addNote: (selector, travelId) => {
+        if(!selector || !travelId) return false
+        $(selector).on('submit', function (e) {
+            e.preventDefault()
+            const noteId = $(this).data('noteid')
+            const noteText = $(this).find('textarea').val().trim()
+            octo.addNote(travelId, noteId, noteText)
+        })
+    },
+
     displaySavedTravels: () => {
         const travels = octo.readFromLocalStorage('travels')
         if (travels) {
