@@ -98,6 +98,28 @@ const octo = {
     },
 
     /**
+     * Update the travel in the local data model and localStorage
+     * @param {string} id uuidv4 of the travel plan to update
+     * @param {object} data array of objects containing the user inputs
+     * 
+     * @returns {boolean}
+     */
+    editTravelPlan: (id, data) => {
+        if (!id) return model.travels
+        const index = model.travels.findIndex((elem) => elem.id === id)
+        if (index === -1) return false
+
+        const obj = {}
+        obj.id = id
+        obj.data = data
+        model.travels[index] = obj
+
+        // update localStorage
+        octo.saveToLocalStorage('travels', model.travels)
+        return true
+    }, 
+
+    /**
      * arrayToKeyedObj takes an array and returns a keyed object based
      * on the key passed as parameter 
      * @param {array} array array of objects with data to be converted
@@ -176,10 +198,11 @@ const octo = {
      * @param {string} options.travelId uuidV4 of the travel
      * @param {object} options.inputs User inputs in keyed object
      * @param {object} options.depMoment Moment object of the departure data
-     * 
+     * @param {boolean} [update=false] If true the function returns only the 
+     *                                 cardFront template 
      * @returns {string}
      */
-    cardTemplate: (options) => {
+    cardTemplate: (options, update=false) => {
         if (!options.travelId || !options.inputs || !options.depMoment) {
             return console.log('Missing options')
         }
@@ -193,48 +216,52 @@ const octo = {
             const arrMoment = moment(`${inputs.arrDate.value} ${inputs.arrivalTime.value}`, 'MM/DD/YYYY HH:mm')
             arrDate = arrMoment.format('DDMMM').toUpperCase()
         }
+        const cardFront = `
+        <div class='card-front'>
+            <div class="card-backdrop"></div>
+            <div class="card-container">
+                <h2 class="card-head" data-destination="${destination}">
+                ${duration} days to ${destination}
+                </h2>
+                <div class="card-important">Departing:</div>
+                <div>${options.depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
+                <hr class="separator">
+                <div class="card-info-group">
+                    <div>
+                        <h6>Flight Details:</h6>
+                        <button class="btn-warning edit-card">Edit</button>
+                    </div>
+                    <div class="card-group">
+                        <div class="info-note">Origin</div>
+                        <div class="text-uppercase">
+                        ${inputs.flightOrigin.value} ${options.depMoment.format('DDMMM')} ${inputs.originTime.value}
+                        </div>
+                        <div class="info-note">Destination</div>
+                        <div class="text-uppercase">
+                        ${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}
+                        </div>
+                        <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
+                    </div>
+                </div>
+                <hr class="separator">
+                <div class="card-group weather">
+                    <div class="card-important">
+                    <span>Tipical</span> weather for travel date</div>
+                </div>
+                <div class="note-group">
+                    <button class="btn-primary note-btn">
+                        <span class="fas fa-plus"></span>
+                        <span>Add Note</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        `
+        if(update) return cardFront
         return `<div class="card" data-travelid="${options.travelId}">
             <span class="delete-button fas fa-trash-alt"></span>
             <div class='card-inner'>
-                <div class='card-front'>
-                    <div class="card-backdrop"></div>
-                    <div class="card-container">
-                        <h2 class="card-head" data-destination="${destination}">
-                        ${duration} days to ${destination}
-                        </h2>
-                        <div class="card-important">Departing:</div>
-                        <div>${options.depMoment.format('MMM DD, YYYY')} - ${timeToNow}</div>
-                        <hr class="separator">
-                        <div class="card-info-group">
-                            <div>
-                                <h6>Flight Details:</h6>
-                                <button class="btn-warning edit-card">Edit</button>
-                            </div>
-                            <div class="card-group">
-                                <div class="info-note">Origin</div>
-                                <div class="text-uppercase">
-                                ${inputs.flightOrigin.value} ${options.depMoment.format('DDMMM')} ${inputs.originTime.value}
-                                </div>
-                                <div class="info-note">Destination</div>
-                                <div class="text-uppercase">
-                                ${inputs.flightDestination.value} ${arrDate} ${inputs.arrivalTime.value}
-                                </div>
-                                <div>${inputs.airline.value} ${inputs.flightNumber.value}</div>
-                            </div>
-                        </div>
-                        <hr class="separator">
-                        <div class="card-group weather">
-                            <div class="card-important">
-                            <span>Tipical</span> weather for travel date</div>
-                        </div>
-                        <div class="note-group">
-                            <button class="btn-primary note-btn">
-                                <span class="fas fa-plus"></span>
-                                <span>Add Note</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                ${cardFront}
                 <div class='card-back'>
                     <span class="close">&#10005;</span>
                     <h2 class='card-head'>Update travel plan</h2>
@@ -493,10 +520,53 @@ const view = {
             const travelId = $(this).parents('.card').data('travelid')
             const travelPlan = octo.getTravelPlan(travelId)[0]
             const inputs = octo.arrayToKeyedObj(travelPlan.data, 'name')
-            $(this).parents('.card-front').siblings('.card-back')
-                .append(octo.cardBackTemplate(travelId, inputs))
-        
+            const cardBack = $(this).parents('.card-front').siblings('.card-back')
+            cardBack.find('form').remove()
+            cardBack.append(octo.cardBackTemplate(travelId, inputs))   
             view.flipCard($(this).parents('.card-inner'), undefined, 180)
+            
+        })
+
+        view.displayEditedTravel()
+    },
+
+    displayEditedTravel: () => {
+        $('#mainContainer').on('submit', '.update-travel', function(e) {
+            e.preventDefault()
+            const travelId = $(this).data('travelid')
+            const userInputs = $(this).serializeArray()
+            if(!octo.editTravelPlan(travelId, userInputs)) {
+                return $.alert({
+                    theme: 'material',
+                    title: 'Error!',
+                    content: 'An error occurred. Unable to update travel',
+                    useBootstrap: false,
+                    boxWidth: '50%',
+                });
+            }
+            const inputs = octo.arrayToKeyedObj(userInputs, 'name')
+            const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
+            const destination = inputs.travelDestination.value
+            const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
+            if (!view.datesValidation(duration, "[name='retDate']")) return
+
+            const card = $(this).parents('.card')
+            view.flipCard($(this).parents('.card-inner'), undefined, 0)
+            card.empty().append(
+                octo.cardTemplate({ travelId, inputs, depMoment }, true)
+                )
+                
+            view.updateContainerHeight()
+            window.scrollTo({ top: 100, left: 100, behavior: 'smooth' })
+            Client.apiHandler.getWeather(destination, depMoment)
+                .then((data) => {
+                    view.displayWeather(travelId, data)
+                })
+
+            Client.apiHandler.getImages(destination)
+                .then((data) => {
+                    view.updateBackgroundImage(travelId, data)
+                })
         })
     },
 
