@@ -463,10 +463,23 @@ const view = {
         $('#mainContainer').on('click', '.note-btn', function (e) {
             e.stopPropagation()
             e.preventDefault()
+            const travelId = $(this).parents('.card').data('travelid')
             const textArea = $('<textarea>')
             textArea.addClass('note-text')
-            $(this).parent().append(textArea)
-                .append('<span class="fas fa-trash-alt delete-note btn btn-danger"></span>')
+            const noteForm = `
+                <form action="#" class="note-form" data-travelid=${travelId}>
+                    <textarea class='note-text' spellcheck="true"></textarea>
+                    <div>
+                        <button class="btn btn-danger delete-note">
+                            <span class="fas fa-trash-alt"></span>
+                        </button>
+                        <button type="submit" class="btn btn-primary add-note">
+                            <span class="fas fa-plus"></span>
+                        </button>
+                    </div>
+                </form>
+            `
+            $(this).parent().append(noteForm)
             view.updateContainerHeight()
         })
 
@@ -553,11 +566,12 @@ const view = {
             const duration = moment(inputs.retDate.value, 'MM/DD/YYYY ').diff(depMoment, 'days')
             if (!view.datesValidation(duration, "[name='retDate']")) return
 
-            const card = $(this).parents('.card')
-            view.flipCard($(this).parents('.card-inner'), undefined, 0)
-            card.empty().append(
+            const cardInner = $(this).parents('.card-inner')
+            cardInner.find('.card-front').remove()
+            cardInner.append(
                 octo.cardTemplate({ travelId, inputs, depMoment }, true)
                 )
+            view.flipCard($(this).parents('.card-inner'), undefined, 0)
                 
             view.updateContainerHeight()
             window.scrollTo({ top: 100, left: 100, behavior: 'smooth' })
@@ -681,7 +695,7 @@ const view = {
                 })
         })
     },
-
+    
     displaySavedTravels: () => {
         const travels = octo.readFromLocalStorage('travels')
         if (travels) {
