@@ -29,7 +29,8 @@ const model = {
             'climacon': 'lightning'
         }
     ],
-    travels: []
+    travels: [],
+    notes: []
 }
 
 /**
@@ -342,10 +343,45 @@ const octo = {
         `
     },
 
+    getNote: (noteId) => {
+        if(!noteId) return false
+        return model.notes.filter((note, index) => {
+            note.index = index
+            if(note.noteId === noteId) return { ...note }
+        })
+    },
+
     addNote: (travelId, noteId, noteText) => {
-        console.log(travelId)
-        console.log(noteId);
-        console.log(noteText); 
+        const note = octo.getNote(noteId)
+        if(note.length > 0) {           
+            return octo.editNote(note[0].noteId, noteText, note[0].index)
+        }
+        
+        const noteObj = {
+            travelId,
+            noteId,
+            noteText
+        }
+
+        model.notes.push(noteObj)
+        // update localStorage
+        octo.saveToLocalStorage('notes', model.notes)
+        
+        return true
+    },
+
+    editNote: (noteId, newNoteText, index=false) => {       
+        if(index) {
+            model.notes[index].noteText = newNoteText
+            return true
+        }
+
+        if (!noteId) return false
+        const idx = model.notes.findIndex((elem) => elem.noteId === noteId)
+        if (idx === -1) return false
+
+        model.notes[idx].noteText = newNoteText
+        return true
     },
 
     /** 
