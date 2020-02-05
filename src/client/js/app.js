@@ -353,7 +353,7 @@ const octo = {
 
     addNote: (travelId, noteId, noteText) => {
         const note = octo.getNote(noteId)
-        if(note.length > 0) {           
+        if(note.length > 0) {          
             return octo.editNote(note[0].noteId, noteText, note[0].index)
         }
         
@@ -373,14 +373,17 @@ const octo = {
     editNote: (noteId, newNoteText, index=false) => {       
         if(index) {
             model.notes[index].noteText = newNoteText
-            return true
         }
 
-        if (!noteId) return false
-        const idx = model.notes.findIndex((elem) => elem.noteId === noteId)
-        if (idx === -1) return false
-
-        model.notes[idx].noteText = newNoteText
+        else if (!noteId) return false
+        else {
+            const idx = model.notes.findIndex((elem) => elem.noteId === noteId)
+            if (idx === -1) return false
+    
+            model.notes[idx].noteText = newNoteText
+        }
+        // update localStorage
+        octo.saveToLocalStorage('notes', model.notes) 
         return true
     },
 
