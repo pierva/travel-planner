@@ -357,16 +357,23 @@ const octo = {
     },
 
     /**
-     * @param {string} noteId uuidv4 of the note
+     * @param {string} [noteId] uuidv4 of the note
+     * @param {string} [travelId=false] uuidv4 of the parent travel 
      * 
-     * @returns {array | boolean} returns array if a note is found 
-     *                            false if no noteId is provided
+     * @returns {array} returns array. If no id is provided it returns
+     *                  all the notes in the data model
      */
-    getNote: (noteId) => {
-        if(!noteId) return false
+    getNote: (noteId, travelId=false) => {
+        if(!noteId && !travelId) return model.notes
         return model.notes.filter((note, index) => {
-            note.index = index
-            if(note.noteId === noteId) return { ...note }
+            note.index = index           
+            if(travelId) {
+                if(note.travelId === travelId) return { ...note } 
+            } else if (noteId) {
+                if(note.noteId === noteId) return { ...note }
+            } else {
+                return []
+            }
         })
     },
 
@@ -555,28 +562,38 @@ const view = {
         }
     },
 
+    /**
+     * @param {string} noteId uuidv4 of the note
+     * @param {string} travelId uuidv4 of the parent travel
+     * @param {string} [noteText=''] pass this parameter to prepopulate
+     *                               the textarea with text
+     * 
+     * @return {string} html form
+     */
+    getNoteForm: (noteId, travelId, noteText='') => {
+        return `
+            <form action="#" data-noteid="${noteId}" class="note-form" data-travelid="${travelId}">
+                <textarea name="noteText" class='note-text' spellcheck="true">${noteText}</textarea>
+                <div>
+                    <button class="btn btn-danger delete-note">
+                        <span class="fas fa-trash-alt"></span>
+                    </button>
+                    <button type="submit" class="btn btn-primary add-note">
+                        <span class="fas fa-plus"></span>
+                    </button>
+                </div>
+            </form>
+        `
+    },
+
     handleNote: () => {
         // Don't use arrow function otherwise this won't be accessible
         $('#mainContainer').on('click', '.note-btn', function (e) {
             e.stopPropagation()
             e.preventDefault()
             const travelId = $(this).parents('.card').data('travelid')
-            const textArea = $('<textarea>')
-            textArea.addClass('note-text')
             const noteId = octo.uuidv4()
-            const noteForm = `
-                <form action="#" data-noteid="${noteId}" class="note-form" data-travelid="${travelId}">
-                    <textarea name="noteText" class='note-text' spellcheck="true"></textarea>
-                    <div>
-                        <button class="btn btn-danger delete-note">
-                            <span class="fas fa-trash-alt"></span>
-                        </button>
-                        <button type="submit" class="btn btn-primary add-note">
-                            <span class="fas fa-plus"></span>
-                        </button>
-                    </div>
-                </form>
-            `
+            const noteForm = view.getNoteForm(noteId, travelId)
             $(this).parent().append(noteForm)
             view.updateContainerHeight()
             view.addNote(`[data-noteid="${noteId}"]`, travelId)
@@ -809,15 +826,23 @@ const view = {
 
     displaySavedTravels: () => {
         const travels = octo.readFromLocalStorage('travels')
+        octo.readFromLocalStorage('notes')
         if (travels) {
             $.each(travels, (index, travel) => {
                 const inputs = octo.arrayToKeyedObj(travel.data, 'name')
                 const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
                 const destination = inputs.travelDestination.value
-  
+                const notes = octo.getNote(undefined, travel.id)
+                
                 $('#mainContainer').prepend(
                     octo.cardTemplate({ travelId: travel.id, inputs, depMoment })
-                )
+                    )
+                const noteGroup = $(`[data-travelid="${travel.id}"]`)
+                    .find('.note-group')
+                $.each(notes, (idx, note) => {
+                    noteGroup.append(
+                        view.getNoteForm(note.noteId, travel.id, note.noteText))
+                })
                 view.updateContainerHeight()
                 Client.apiHandler.getWeather(destination, depMoment)
                     .then((data) => {
