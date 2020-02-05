@@ -422,6 +422,23 @@ const octo = {
         return true
     },
 
+    /**
+     * @param {string} noteId uuidv4 of the note to be deleted
+     * 
+     * @returns {boolean}
+     */
+    deleteNote: (noteId) => {
+        const idx = model.notes.findIndex((elem) => elem.noteId === noteId)
+        if (idx === -1) return false
+
+        // delete travel from local model
+        model.notes.splice(index, 1)
+
+        // update localStorage
+        octo.saveToLocalStorage('notes', model.notes)
+        return true
+    },
+
     /** 
      * function taken from MDN docs. It checks if local or session storage is
      * available
