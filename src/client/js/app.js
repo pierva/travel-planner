@@ -271,6 +271,19 @@ const octo = {
         </div>`
     },
 
+    /**
+     * 
+     * @param {string} travelId uuidV4 of the travel
+     * @param {Object} options Required options to generate the template
+     *                         Options will contain all the user 
+     *                         inputs in keyed json
+     *                         Ex. options.travelDestination: {
+     *                              name: 'travelDestination',
+     *                              value: 'Miami'
+     *                          }
+     * 
+     * @returns {string}
+     */
     cardBackTemplate: (travelId, options) => {
         return `
             <form action="#" class='update-travel' data-travelid="${travelId}">
@@ -343,6 +356,12 @@ const octo = {
         `
     },
 
+    /**
+     * @param {string} noteId uuidv4 of the note
+     * 
+     * @returns {array | boolean} returns array if a note is found 
+     *                            false if no noteId is provided
+     */
     getNote: (noteId) => {
         if(!noteId) return false
         return model.notes.filter((note, index) => {
@@ -351,6 +370,13 @@ const octo = {
         })
     },
 
+    /**
+     * @param {string} travelId uuidv4 of the travel parent of the note
+     * @param {string} noteId uuidv4 of the note
+     * @param {string} noteText 
+     * 
+     * @returns {boolean}
+     */
     addNote: (travelId, noteId, noteText) => {
         const note = octo.getNote(noteId)
         if(note.length > 0) {          
@@ -370,6 +396,15 @@ const octo = {
         return true
     },
 
+    /**
+     * @param {string} noteId uuidv4 of the note 
+     * @param {string} newNoteText
+     * @param {int} [index=false] provide the index to quickly access 
+     *                            the note in the notes array without
+     *                            going through the filter method
+     * 
+     * @returns {boolean}
+     */
     editNote: (noteId, newNoteText, index=false) => {       
         if(index) {
             model.notes[index].noteText = newNoteText
@@ -534,7 +569,10 @@ const view = {
         $('#mainContainer').on('click', '.delete-note', function (e) {
             e.stopPropagation()
             e.preventDefault()
-            $(this).parents('form').remove()
+            const form = $(this).parents('form')
+            const noteId = form.data('noteid')
+            
+            form.remove()
             view.updateContainerHeight()
         })
     },
