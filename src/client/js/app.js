@@ -425,7 +425,7 @@ const octo = {
     saveToLocalStorage: (name, value) => {
         try {
             // Clear all values previously saved
-            localStorage.clear();
+            localStorage.removeItem(name);
 
             if (octo.storageAvailable()) {
                 localStorage.setItem(name, JSON.stringify(value))
