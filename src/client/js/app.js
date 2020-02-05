@@ -432,7 +432,7 @@ const octo = {
         if (idx === -1) return false
 
         // delete travel from local model
-        model.notes.splice(index, 1)
+        model.notes.splice(idx, 1)
 
         // update localStorage
         octo.saveToLocalStorage('notes', model.notes)
@@ -588,7 +588,7 @@ const view = {
             e.preventDefault()
             const form = $(this).parents('form')
             const noteId = form.data('noteid')
-            
+            octo.deleteNote(noteId)
             form.remove()
             view.updateContainerHeight()
         })
