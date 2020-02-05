@@ -814,19 +814,23 @@ const view = {
         })
     },
 
+    /**
+     * @param {string} selector jQuery selector to access the note form
+     * @param {string} travelId uuidv4 of the parent travel
+     */
     addNote: (selector, travelId) => {
         if(!selector || !travelId) return false
         $(selector).on('submit', function (e) {
             e.preventDefault()
             const noteId = $(this).data('noteid')
             const noteText = $(this).find('textarea').val().trim()
-            octo.addNote(travelId, noteId, noteText)
+            return octo.addNote(travelId, noteId, noteText)
         })
     },
 
     displaySavedTravels: () => {
         const travels = octo.readFromLocalStorage('travels')
-        octo.readFromLocalStorage('notes')
+        const savedNotes = octo.readFromLocalStorage('notes')
         if (travels) {
             $.each(travels, (index, travel) => {
                 const inputs = octo.arrayToKeyedObj(travel.data, 'name')
@@ -853,6 +857,15 @@ const view = {
                     .then((data) => {
                         view.updateBackgroundImage(travel.id, data)
                     })
+            })
+        }
+        if(savedNotes.length > 0) {
+            $('#mainContainer').on('submit', '.note-form', function (e) {
+                e.preventDefault()
+                const noteId = $(this).data('noteid')
+                const travelId = $(this).data('travelid')
+                const noteText = $(this).find('textarea').val().trim()
+                return octo.addNote(travelId, noteId, noteText)
             })
         }
     },
