@@ -1,6 +1,6 @@
 const apiStatic = {
     geonamesURI: 'http://api.geonames.org/geoCodeAddressJSON?q=',
-    geonamesUser: 'piervalerio',
+    geonamesUser: 'username',
     baseUrl: 'http://localhost:8081', //Change it to window.location.origin in production
 }
 
