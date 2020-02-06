@@ -89,7 +89,7 @@ const octo = {
         if (!id) return false
         const index = model.travels.findIndex((elem) => elem.id === id)
         if (index === -1) return false
-        
+
         // delete travel from local model
         model.travels.splice(index, 1)
 
@@ -118,7 +118,7 @@ const octo = {
         // update localStorage
         octo.saveToLocalStorage('travels', model.travels)
         return true
-    }, 
+    },
 
     /**
      * arrayToKeyedObj takes an array and returns a keyed object based
@@ -203,7 +203,7 @@ const octo = {
      *                                 cardFront template 
      * @returns {string}
      */
-    cardTemplate: (options, update=false) => {
+    cardTemplate: (options, update = false) => {
         if (!options.travelId || !options.inputs || !options.depMoment) {
             return console.log('Missing options')
         }
@@ -258,7 +258,7 @@ const octo = {
             </div>
         </div>
         `
-        if(update) return cardFront
+        if (update) return cardFront
         return `<div class="card" data-travelid="${options.travelId}">
             <span class="delete-button fas fa-trash-alt"></span>
             <div class='card-inner'>
@@ -363,14 +363,14 @@ const octo = {
      * @returns {array} returns array. If no id is provided it returns
      *                  all the notes in the data model
      */
-    getNote: (noteId, travelId=false) => {
-        if(!noteId && !travelId) return model.notes
+    getNote: (noteId, travelId = false) => {
+        if (!noteId && !travelId) return model.notes
         return model.notes.filter((note, index) => {
-            note.index = index           
-            if(travelId) {
-                if(note.travelId === travelId) return { ...note } 
+            note.index = index
+            if (travelId) {
+                if (note.travelId === travelId) return { ...note }
             } else if (noteId) {
-                if(note.noteId === noteId) return { ...note }
+                if (note.noteId === noteId) return { ...note }
             } else {
                 return []
             }
@@ -386,10 +386,10 @@ const octo = {
      */
     addNote: (travelId, noteId, noteText) => {
         const note = octo.getNote(noteId)
-        if(note.length > 0) {          
+        if (note.length > 0) {
             return octo.editNote(note[0].noteId, noteText, note[0].index)
         }
-        
+
         const noteObj = {
             travelId,
             noteId,
@@ -399,7 +399,7 @@ const octo = {
         model.notes.push(noteObj)
         // update localStorage
         octo.saveToLocalStorage('notes', model.notes)
-        
+
         return true
     },
 
@@ -412,8 +412,8 @@ const octo = {
      * 
      * @returns {boolean}
      */
-    editNote: (noteId, newNoteText, index=false) => {       
-        if(index) {
+    editNote: (noteId, newNoteText, index = false) => {
+        if (index) {
             model.notes[index].noteText = newNoteText
         }
 
@@ -421,11 +421,11 @@ const octo = {
         else {
             const idx = model.notes.findIndex((elem) => elem.noteId === noteId)
             if (idx === -1) return false
-    
+
             model.notes[idx].noteText = newNoteText
         }
         // update localStorage
-        octo.saveToLocalStorage('notes', model.notes) 
+        octo.saveToLocalStorage('notes', model.notes)
         return true
     },
 
@@ -444,6 +444,59 @@ const octo = {
         // update localStorage
         octo.saveToLocalStorage('notes', model.notes)
         return true
+    },
+
+    /**
+     * @param {string} travelId uuidv4 of travel
+     * @param {array} newInputs array with user inputs values Example
+     *                          [{name: depData, value: '11/21/2020'},{...}]
+     * @param {array} valuesToCompare array of string with the input name to 
+     *                                compare. Ex. ['depDate', 'travelDestination']
+     * @returns {object} Object with keys the values provided in valuesToCompare
+     *                   and a boolean to indicate whether is the same or not.
+     *                   Example:
+     *                   {depDate: false, travelDestination: true}
+     */
+    isTravelValueDifferent: (travelId, newInputs, valuesToCompare) => {
+        const travelData = octo.getTravelPlan(travelId)
+        const dataObj = octo.arrayToKeyedObj(travelData[0].data, 'name')
+        const inputObj = octo.arrayToKeyedObj(newInputs, 'name')
+        const obj = {}
+        $.each(valuesToCompare, (idx, value) => {
+            if (dataObj[value].value === inputObj[value].value) {
+                obj[value] = false
+            } else {
+                obj[value] = true
+            }
+        })
+        return obj
+    },
+
+    /**
+     * @param {string} travelId uuidv4 of travel
+     * @param {object} data response from API
+     * 
+     * @returns {object} updated travel obj from model
+     */
+    saveImageData: (travelId, data) => {
+        const index = model.travels.findIndex((elem) => elem.id === travelId)
+        model.travels[index].imageData = data
+        return model.travels[index]
+    },
+
+    /**
+     * @param {string} travelId uuidv4 of travel
+     * @returns {array | boolean} array if data is found, false if 
+     *                             there is no image data
+     */
+    getImageData: (travelId) => {
+        if (!travelId) return false
+        return model.travels.filter((elem) => {
+            if (elem.id === travelId) {
+                if (elem.imageData) return elem.imageData
+                return false
+            }
+        })
     },
 
     /** 
@@ -570,7 +623,7 @@ const view = {
      * 
      * @return {string} html form
      */
-    getNoteForm: (noteId, travelId, noteText='') => {
+    getNoteForm: (noteId, travelId, noteText = '') => {
         return `
             <form action="#" data-noteid="${noteId}" class="note-form" data-travelid="${travelId}">
                 <textarea name="noteText" class='note-text' spellcheck="true">${noteText}</textarea>
@@ -638,8 +691,8 @@ const view = {
     },
 
     closeNewCard: () => {
-        $('#mainContainer').on('click', '.close', function(e) {
-            e.preventDefault()          
+        $('#mainContainer').on('click', '.close', function (e) {
+            e.preventDefault()
             $(this).parents('.card-inner, .new-card-inner')
                 .css('transform', 'rotateY(0deg)')
         })
@@ -653,23 +706,25 @@ const view = {
             const inputs = octo.arrayToKeyedObj(travelPlan.data, 'name')
             const cardBack = $(this).parents('.card-front').siblings('.card-back')
             cardBack.find('form').remove()
-            cardBack.append(octo.cardBackTemplate(travelId, inputs))   
+            cardBack.append(octo.cardBackTemplate(travelId, inputs))
 
             //Re-inizialize the datapicker
             $('.datepicker').datepicker()
             view.flipCard($(this).parents('.card-inner'), undefined, 180)
-            
+
         })
 
         view.displayEditedTravel()
     },
 
+
+
     displayEditedTravel: () => {
-        $('#mainContainer').on('submit', '.update-travel', function(e) {
+        $('#mainContainer').on('submit', '.update-travel', function (e) {
             e.preventDefault()
             const travelId = $(this).data('travelid')
             const userInputs = $(this).serializeArray()
-            if(!octo.editTravelPlan(travelId, userInputs)) {
+            if (!octo.editTravelPlan(travelId, userInputs)) {
                 return $.alert({
                     theme: 'material',
                     title: 'Error!',
@@ -688,7 +743,7 @@ const view = {
             cardInner.find('.card-front').remove()
             cardInner.append(
                 octo.cardTemplate({ travelId, inputs, depMoment }, true)
-                )
+            )
             const noteGroup = $(`[data-travelid="${travelId}"]`)
                 .find('.note-group')
             $.each(octo.getNote(undefined, travelId), (idx, note) => {
@@ -696,18 +751,38 @@ const view = {
                     view.getNoteForm(note.noteId, travelId, note.noteText))
             })
             view.flipCard($(this).parents('.card-inner'), undefined, 0)
-                
+
             view.updateContainerHeight()
             window.scrollTo({ top: 100, left: 100, behavior: 'smooth' })
+            const comparedValues = octo.isTravelValueDifferent(
+                travelId, userInputs, ['travelDestination', 'depDate'])
+
             Client.apiHandler.getWeather(destination, depMoment)
                 .then((data) => {
                     view.displayWeather(travelId, data)
                 })
-
-            Client.apiHandler.getImages(destination)
-                .then((data) => {
-                    view.updateBackgroundImage(travelId, data)
-                })
+            // Call the API only if travel destination has changed
+            if (comparedValues.travelDestination) {
+                Client.apiHandler.getImages(destination)
+                    .then((data) => {
+                        view.updateBackgroundImage(travelId, data)
+                    })
+            } else {
+                //Travel destination is the same
+                // check if we have the background image data
+                const imgData = octo.getImageData(travelId)
+                console.log(imgData);
+                
+                if (imgData.length > 0) { 
+                    return view.updateBackgroundImage(travelId, imgData[0])
+                }
+                //No image data found in the model 
+                Client.apiHandler.getImages(destination)
+                    .then((data) => {
+                        octo.saveImageData(travelId, data)
+                        view.updateBackgroundImage(travelId, data)
+                    })
+            }
         })
     },
 
@@ -815,6 +890,7 @@ const view = {
 
             Client.apiHandler.getImages(destination)
                 .then((data) => {
+                    octo.saveImageData(id, data)
                     view.updateBackgroundImage(id, data)
                 })
         })
@@ -825,7 +901,7 @@ const view = {
      * @param {string} travelId uuidv4 of the parent travel
      */
     addNote: (selector, travelId) => {
-        if(!selector || !travelId) return false
+        if (!selector || !travelId) return false
         $(selector).on('submit', function (e) {
             e.preventDefault()
             const noteId = $(this).data('noteid')
@@ -843,10 +919,10 @@ const view = {
                 const depMoment = moment(`${inputs.depDate.value} ${inputs.originTime.value}`, 'MM/DD/YYYY HH:mm')
                 const destination = inputs.travelDestination.value
                 const notes = octo.getNote(undefined, travel.id)
-                
+
                 $('#mainContainer').prepend(
                     octo.cardTemplate({ travelId: travel.id, inputs, depMoment })
-                    )
+                )
                 const noteGroup = $(`[data-travelid="${travel.id}"]`)
                     .find('.note-group')
                 $.each(notes, (idx, note) => {
@@ -865,7 +941,7 @@ const view = {
                     })
             })
         }
-        if(savedNotes.length > 0) {
+        if (savedNotes.length > 0) {
             $('#mainContainer').on('submit', '.note-form', function (e) {
                 e.preventDefault()
                 const noteId = $(this).data('noteid')
