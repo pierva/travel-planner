@@ -579,7 +579,7 @@ const view = {
                         <span class="fas fa-trash-alt"></span>
                     </button>
                     <button type="submit" class="btn btn-primary add-note">
-                        <span class="fas fa-plus"></span>
+                        <span class="fas fa-save"></span>
                     </button>
                 </div>
             </form>
@@ -689,6 +689,12 @@ const view = {
             cardInner.append(
                 octo.cardTemplate({ travelId, inputs, depMoment }, true)
                 )
+            const noteGroup = $(`[data-travelid="${travelId}"]`)
+                .find('.note-group')
+            $.each(octo.getNote(undefined, travelId), (idx, note) => {
+                noteGroup.append(
+                    view.getNoteForm(note.noteId, travelId, note.noteText))
+            })
             view.flipCard($(this).parents('.card-inner'), undefined, 0)
                 
             view.updateContainerHeight()
