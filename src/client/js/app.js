@@ -93,6 +93,9 @@ const octo = {
         // delete travel from local model
         model.travels.splice(index, 1)
 
+        // delete notes associated to travel plan
+        octo.deleteNote()
+
         // update localStorage
         octo.saveToLocalStorage('travels', model.travels)
         return true
@@ -431,16 +434,24 @@ const octo = {
 
     /**
      * @param {string} noteId uuidv4 of the note to be deleted
-     * 
+     * @param {string} travelId uuidv4 of travelId
      * @returns {boolean}
      */
-    deleteNote: (noteId) => {
-        const idx = model.notes.findIndex((elem) => elem.noteId === noteId)
-        if (idx === -1) return false
+    deleteNote: (noteId, travelId=false) => {
 
-        // delete travel from local model
-        model.notes.splice(idx, 1)
-
+        if(travelId) {
+            const filteredNotes = model.notes.filter((note) => {
+                return note.travelId !== travelId
+            })
+            model.notes = filteredNotes
+            
+        } else {
+            const idx = model.notes.findIndex((elem) => elem.noteId === noteId)
+            if (idx === -1) return false
+    
+            // delete note from local model
+            model.notes.splice(idx, 1)
+        }
         // update localStorage
         octo.saveToLocalStorage('notes', model.notes)
         return true
@@ -567,6 +578,7 @@ const octo = {
             model[modelKey] = parsedData
             return parsedData
         }
+        return null
     }
 
 }
@@ -940,15 +952,17 @@ const view = {
                         view.updateBackgroundImage(travel.id, data)
                     })
             })
-        }
-        if (savedNotes.length > 0) {
-            $('#mainContainer').on('submit', '.note-form', function (e) {
-                e.preventDefault()
-                const noteId = $(this).data('noteid')
-                const travelId = $(this).data('travelid')
-                const noteText = $(this).find('textarea').val().trim()
-                return octo.addNote(travelId, noteId, noteText)
-            })
+            if (savedNotes) {
+                if(savedNotes.length > 0) {
+                    $('#mainContainer').on('submit', '.note-form', function (e) {
+                        e.preventDefault()
+                        const noteId = $(this).data('noteid')
+                        const travelId = $(this).data('travelid')
+                        const noteText = $(this).find('textarea').val().trim()
+                        return octo.addNote(travelId, noteId, noteText)
+                    })
+                }
+            }
         }
     },
 
@@ -974,6 +988,7 @@ const view = {
                             $('.new-card').css('height', '400px')
                             $(deleteBtn).parent().remove()
                             octo.deleteTravelPlan(travelId)
+                            octo.deleteNote(undefined, travelId)
                         }
 
                     },
