@@ -44,7 +44,7 @@ const octo = {
     },
     /**
      * Function taken from Stackoverflow https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
-     * @returns {string} uuid v4 - 16chars
+     * @returns {string} uuid v4 - 36chars
      */
     uuidv4: () => {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
