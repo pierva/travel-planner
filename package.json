@@ -4,7 +4,7 @@
   "description": "Capstone project for Udacity Front End Web Developer nanodegree",
   "main": "index.js",
   "scripts": {
-    "test": "jest --testTimeout=10000",
+    "test": "jest --testTimeout=10000 --verbose",
     "start-dev": "nodemon src/server/index.js",
     "start": "node src/server/index.js",
     "build-prod": "webpack --config webpack.prod.js",
@@ -19,6 +19,8 @@
     "express": "^4.17.1",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
+    "regenerator-runtime": "^0.13.3",
+    "supertest": "^4.0.2",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
   },

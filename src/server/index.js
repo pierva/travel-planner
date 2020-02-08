@@ -90,14 +90,12 @@ app.post('/weather', async (req, res) => {
 app.get('/pictures/:destination', async (req, res) => {
     const{ destination} = req.params
     if(destination === 'undefined') {
-        console.log('im here')
         return res.status(400).json({
             error: 'No destination provided',
             status: 400
         })
     }
     if(destination.trim() === "") {
-        console.log('here')
         return res.status(400).json({
             error: 'Invalid destination',
             status: 400
