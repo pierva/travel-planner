@@ -59,7 +59,6 @@ describe('Test weather endpoint', () => {
                 time: 1581125662
             })
             expect(res.statusCode).toEqual(200)
-            expect(JSON.parse(res.text)).toHaveProperty('daily')
             done()
     })
 })
