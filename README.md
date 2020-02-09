@@ -40,3 +40,27 @@ $ npm run build-prod
 And you can serve the distribution folder from the express server by navigating to http://localhost:8081/
 
 In order to visit port 8081 on localhost, you need to have the express server running, either in production or development mode.
+
+
+## Host application on heroku
+
+In order to deploy the application in heroku, it is necessary to make few changes.
+ 1. The servers should liste to process.env.PORT as Heroku dinamically assign a port, therefore it can't be hardcoded
+ 2. Any call to the backend server should have the url changed to `window.origin.location`
+ 3. Add the following script in package.json 
+    ```js
+    "heroku-postbuild": "webpack --config webpack.prod.js"
+    ```
+   The script for the post build should match the production build script used in package.json
+
+ 4. Login to heroku.com and create a new app
+ 5. Install the Heroku CLI toolbelt in order to use heroku commands in the terminal
+ 6. Add the heroku application origin with 
+    ```sh
+    $ heroku git:remote -a <your-app-name>
+    ```
+ 7. Push the repository to heroku with (you can push only the master branch):
+    ```sh
+    $ git push heroku master
+    ```
+ 8. If your application uses environment variables, open the app settings in heroku website and add the environment variables there 
